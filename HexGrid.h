@@ -24,7 +24,7 @@ public:
 					const uint8 &bl, const uint8 &b, const uint8 &br);
 	
 	bool IsEmpty(void) const { return (topleft<0 || top<0 || topright<0 || bottomleft<0 || bottom<0 || bottomright<0); }
-	void MakeEmpty(void) { topleft=top=top=bottomleft=bottom=bottomright=-1; }
+	void MakeEmpty(void) { topleft=top=topright=bottomleft=bottom=bottomright=-1; }
 	
 	int8 topleft;
 	int8 top;
