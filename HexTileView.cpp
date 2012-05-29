@@ -197,7 +197,7 @@ void DrawHexTile(HexTileView *owner, BRect r)
 		owner->StrokeLine(point5, point6);
 		owner->StrokeLine(point6, point1);
 		owner->StrokeLine(point1, point2);
-		owner->SetHighColor(highlight);
+//		owner->SetHighColor(highlight);
 		owner->StrokeLine(point2, point3);
 		owner->StrokeLine(point3, point4);
 		owner->StrokeLine(point4, point5);
@@ -262,14 +262,15 @@ void DrawHexTile(HexTileView *owner, BRect r)
 	BRect bevel(r);
 	bevel.InsetBy(1,1);
 	owner->SetHighColor(255,255,255);
-/*	owner->StrokeLine(bevel.point1,bevel.point2);
+/*
+	owner->StrokeLine(bevel.point1,bevel.point2);
 	owner->StrokeLine(bevel.point2,bevel.point3);
 	owner->StrokeLine(bevel.point3,bevel.point4);
 	owner->SetHighColor(0,0,0);
 	owner->StrokeLine(bevel.point4,bevel.point5);
 	owner->StrokeLine(bevel.point5,bevel.point6);
-	owner->StrokeLine(bevel.point6,bevel.point1);  */
-
+	owner->StrokeLine(bevel.point6,bevel.point1);
+*/
 	// Numbers
 	BString string;
 

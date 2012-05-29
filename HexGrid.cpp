@@ -104,7 +104,8 @@ HexTile &HexTile::operator=(const HexTile &t)
 }
 
 
-void HexTile::SetValues(const uint8 &tl, const uint8 &t, const uint8 &tr, const uint8 &bl, const uint8 &b, const uint8 &br)
+void HexTile::SetValues(const uint8 &tl, const uint8 &t, const uint8 &tr, 
+                        const uint8 &bl, const uint8 &b, const uint8 &br)
 {
 	topleft = tl;
 	top = t;
@@ -215,42 +216,41 @@ bool HexGrid::TryTile(HexTile *src, HexTile *dest)
 	if(!src || !dest || src->IsEmpty())
 		return false;
 
-
 	// Return true if the thing is a valid play
 	if(dest->toplefttile && !dest->toplefttile->IsEmpty())
 	{
-		if(dest->toplefttile != src && dest->toplefttile->bottomright!=src->topleft)
+		if(dest->toplefttile != src && dest->toplefttile->bottomright != src->topleft)
 			return false;
 	}
 
 	if(dest->toptile && !dest->toptile->IsEmpty())
 	{
-		if(dest->toptile != src && dest->toptile->bottom!=src->top)
+		if(dest->toptile != src && dest->toptile->bottom != src->top)
 			return false;
 	}
 
 	if(dest->toprighttile && !dest->toprighttile->IsEmpty())
 	{
-		if(dest->toprighttile != src && dest->toprighttile->bottomleft!=src->topright)
+		if(dest->toprighttile != src && dest->toprighttile->bottomleft != src->topright)
 			return false;
 	}
 
 	if(dest->bottomlefttile && !dest->bottomlefttile->IsEmpty())
 	{
-		if(dest->bottomlefttile != src && dest->bottomlefttile->topright!=src->bottomleft)
+		if(dest->bottomlefttile != src && dest->bottomlefttile->topright != src->bottomleft)
 			return false;
 	}
 
 	if(dest->bottomtile && !dest->bottomtile->IsEmpty())
 	{
-		if(dest->bottomtile != src && dest->bottomtile->top!=src->bottom)
+		if(dest->bottomtile != src && dest->bottomtile->top != src->bottom)
 			return false;
 	}
 
 	if(dest->bottomrighttile && !dest->bottomrighttile->IsEmpty())
 	{
-		if(dest->bottomrighttile != src && dest->bottomrighttile->topleft!=src->bottomright)
-		return false;
+		if(dest->bottomrighttile != src && dest->bottomrighttile->topleft != src->bottomright)
+			return false;
 	}
 
 	return true;
@@ -259,7 +259,7 @@ bool HexGrid::TryTile(HexTile *src, HexTile *dest)
 bool HexGrid::IsSolved(void)
 {
 	// return true if the puzzle is solved
-	for(int32 i=0; i<fTiles.CountItems(); i++)
+	for(int32 i = 0; i < fTiles.CountItems(); i++)
 	{
 		HexTile *t = (HexTile*)fTiles.ItemAt(i);
 		if(t->id != i || t->IsEmpty())

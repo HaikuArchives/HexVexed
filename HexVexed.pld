@@ -1,6 +1,6 @@
 NAME=HexVexed
 TARGETNAME=HexVexed
-PLATFORM=HaikuGCC4
+PLATFORM=Haiku
 GROUP=Source Files
 EXPANDGROUP=yes
 SOURCEFILE=AboutWindow.cpp
@@ -17,6 +17,7 @@ SOURCEFILE=Preferences.cpp
 DEPENDENCY=HexVexed/Preferences.cpp|HexVexed/Preferences.
 SOURCEFILE=HexTileView.cpp
 DEPENDENCY=HexVexed/HexTileView.cpp|HexVexed/HexTileView.h|HexVexed/HexGrid.
+SOURCEFILE=HexVexed.rdef
 LOCALINCLUDE=HexVexed
 SYSTEMINCLUDE=/boot/develop/headers/be
 SYSTEMINCLUDE=/boot/develop/headers/cpp

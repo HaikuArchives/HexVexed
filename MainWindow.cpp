@@ -45,7 +45,7 @@ enum
 };
 
 MainWindow::MainWindow(void)
- :	BWindow(BRect(100,100,500,400),"BeVexed",B_TITLED_WINDOW_LOOK,
+ :	BWindow(BRect(100,100,500,400),"HexVexed",B_TITLED_WINDOW_LOOK,
  	B_NORMAL_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE),
  	fGrid(NULL),
  	fWorkGrid(NULL)
@@ -142,7 +142,7 @@ MainWindow::MainWindow(void)
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("How to Play…",new BMessage(M_HOW_TO_PLAY)));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("About BeVexed…",new BMessage(B_ABOUT_REQUESTED)));
+	menu->AddItem(new BMenuItem("About HexVexed…",new BMessage(B_ABOUT_REQUESTED)));
 	GenerateGrid(fGridSize);
 
 	BPoint corner;
@@ -263,11 +263,11 @@ void MainWindow::MessageReceived(BMessage *msg)
 		case M_HOW_TO_PLAY:
 		{
 			BString string =
-				"How to Play BeVexed:\n\n"
+				"How to Play HexVexed:\n\n"
 				"Place the tiles in the grid on the right into the "
 				"grid on the left so that the numbers match wherever "
 				"one tile touches another. Easy to learn, tough to master.\n";
-			BAlert *help = new BAlert("BeVexed",string.String(),"OK");
+			BAlert *help = new BAlert("HexVexed",string.String(),"OK");
 			help->Go();
 			break;
 		}
@@ -299,7 +299,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 
 					if(fWorkGrid->IsSolved())
 					{
-						ImageAlert *alert = new ImageAlert("BeVexedYouWin.jpg",'JPEG');
+						ImageAlert *alert = new ImageAlert("HexVexedYouWin.jpg",'JPEG');
 						alert->Show();
 						GenerateGrid(fGridSize);
 					}
@@ -317,6 +317,12 @@ void MainWindow::MessageReceived(BMessage *msg)
 
 void MainWindow::GenerateGrid(uint8 size)
 {
+	const double factor1 = 0.866; //was 0.75 horizontal spacing
+	const double factor2 = 0.5;  //was 0.5 vertical spacing
+	const double factor3 = 1.7;  //was 1.6
+	const double offset1 = 70; //was 70
+	const double offset2 = 20;  //was 20 
+	
 	if(fGrid)
 	{
 		delete fGrid;
@@ -336,14 +342,11 @@ void MainWindow::GenerateGrid(uint8 size)
 	fGrid->GeneratePuzzle();
 	fWorkGrid = new HexGrid(size);
 
-	ResizeTo( ((fTileSize+5) * size * 1.6) + 70,
-				((fTileSize+5) * size) + fMenuBar->Frame().Height() + 20 );
+	ResizeTo( ((fTileSize+5) * size * 2) + (fTileSize * 0.5),
+			(  (fTileSize+5) * size ) + fMenuBar->Frame().Height() + (fTileSize * 0.5));
 
-//	BRect r(10,fMenuBar->Frame().bottom + 10,
-//			10 + fTileSize,10 + fMenuBar->Frame().bottom + fTileSize);
 	BRect r(10,fMenuBar->Frame().bottom + 10,
 			10 + fTileSize,10 + fMenuBar->Frame().bottom + fTileSize);
-
 
 	for(uint8 row=0; row<size; row++)
 	{
@@ -354,17 +357,17 @@ void MainWindow::GenerateGrid(uint8 size)
 			fBack->AddChild(tile);
 
 		    if ( (col % 2) == 1 ) { 
-		    	r.OffsetBy(((fTileSize * 0.75) + 5), -0.5*fTileSize); 
-		    	tile->SetTile(fGrid->TileAt((size*row) + col));
+		    	r.OffsetBy(((fTileSize * factor1) + fTileSize * 0), -factor2 * fTileSize); 
+		    	tile->SetTile(fGrid->TileAt((size * row) + col));
 			} else {
-		    	r.OffsetBy(((fTileSize * 0.75) + 5), (0.5*fTileSize)+0.25);
-		    	tile->SetTile(fGrid->TileAt((size*row) + col));
+		    	r.OffsetBy(((fTileSize * factor1) + fTileSize * 0), (factor2 * fTileSize));
+		    	tile->SetTile(fGrid->TileAt((size * row) + col));
 		    	r.OffsetBy(0, 0);
 				}
 		}
 
 		if ( (size % 2) == 1 ) 
-			r.OffsetBy(50 ,-0.5*fTileSize-5);
+			r.OffsetBy(50 , -factor2 * fTileSize);
 		else
 			r.OffsetBy(50,0);
 			
@@ -375,19 +378,19 @@ void MainWindow::GenerateGrid(uint8 size)
 			fBack->AddChild(tile);
 			
 		    if ( (col % 2) == 1 ) { 
-				r.OffsetBy(((fTileSize * 0.75) + 5), -0.5*fTileSize);
-		    	tile->SetTile(fGrid->TileAt((size*row) + col));
+				r.OffsetBy(((fTileSize * factor1) + fTileSize * 0), -factor2 * fTileSize);
+				tile->SetTile(fGrid->TileAt((size * row) + col));
 		    } else {
-		    	r.OffsetBy(((fTileSize * 0.75) + 5), (0.5*fTileSize)+0.25);
-		    	tile->SetTile(fGrid->TileAt((size*row) + col));
+		    	r.OffsetBy(((fTileSize * factor1) + fTileSize * 0), (factor2 * fTileSize));
+		    	tile->SetTile(fGrid->TileAt((size * row) + col));
 		    	r.OffsetBy(0, 0);
 				}
 		}
 
 		if ( (size % 2) == 1 ) 
-			r.OffsetBy(-(r.left - 10),0.5*fTileSize-5);
+			r.OffsetBy(-(r.left - 10), factor2 * fTileSize);
 		else
-			r.OffsetBy(-(r.left - 10),fTileSize-5);
+			r.OffsetBy(-(r.left - 10), fTileSize);
 	}
 }
 
@@ -445,4 +448,3 @@ void MainWindow::SetBackground(const char *name)
 		fBack->Invalidate();
 	}
 }
-

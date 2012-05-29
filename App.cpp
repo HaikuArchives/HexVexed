@@ -18,7 +18,7 @@ public:
 };
 
 App::App(void)
- : BApplication("application/x-vnd.wgp-BeVexed")
+ : BApplication("application/x-vnd.wgp-HexVexed")
 {
 	MainWindow *mainwin = new MainWindow();
 	mainwin->Show();
