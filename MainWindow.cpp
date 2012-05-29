@@ -317,8 +317,8 @@ void MainWindow::MessageReceived(BMessage *msg)
 
 void MainWindow::GenerateGrid(uint8 size)
 {
-	const double factor1 = 0.866; //was 0.75 horizontal spacing
-	const double factor2 = 0.5;  //was 0.5 vertical spacing
+	const double factor1 = 0.75; //was 0.75 horizontal spacing
+	const double factor2 = 0.433;  //was 0.5 vertical spacing
 	const double factor3 = 1.7;  //was 1.6
 	const double offset1 = 70; //was 70
 	const double offset2 = 20;  //was 20 
@@ -342,11 +342,16 @@ void MainWindow::GenerateGrid(uint8 size)
 	fGrid->GeneratePuzzle();
 	fWorkGrid = new HexGrid(size);
 
-	ResizeTo( ((fTileSize+5) * size * 2) + (fTileSize * 0.5),
+/*	ResizeTo( ((fTileSize+5) * size * 2) + (fTileSize * 0.5),
 			(  (fTileSize+5) * size ) + fMenuBar->Frame().Height() + (fTileSize * 0.5));
-
-	BRect r(10,fMenuBar->Frame().bottom + 10,
-			10 + fTileSize,10 + fMenuBar->Frame().bottom + fTileSize);
+*/
+	ResizeTo( (fTileSize * size * 2) - (fTileSize * 0.5) + 10,
+			(  fTileSize * size ) + fMenuBar->Frame().Height() + (fTileSize * 0.5) + 10);
+			
+	BRect r(10,
+			fMenuBar->Frame().bottom + 10,
+			10 + fTileSize,
+			10 + fMenuBar->Frame().bottom + fTileSize);
 
 	for(uint8 row=0; row<size; row++)
 	{
@@ -357,19 +362,20 @@ void MainWindow::GenerateGrid(uint8 size)
 			fBack->AddChild(tile);
 
 		    if ( (col % 2) == 1 ) { 
-		    	r.OffsetBy(((fTileSize * factor1) + fTileSize * 0), -factor2 * fTileSize); 
-		    	tile->SetTile(fGrid->TileAt((size * row) + col));
+		    	r.OffsetBy(((fTileSize * factor1) + fTileSize * 0.1), fTileSize * -factor2 - fTileSize * 0.1); 
+		    	tile->SetTile(fWorkGrid->TileAt((size * row) + col));
+	    		r.OffsetBy(0, 0);
 			} else {
-		    	r.OffsetBy(((fTileSize * factor1) + fTileSize * 0), (factor2 * fTileSize));
-		    	tile->SetTile(fGrid->TileAt((size * row) + col));
+		    	r.OffsetBy(((fTileSize * factor1) + fTileSize * 0.1), fTileSize * factor2 + fTileSize * 0.1);
+		    	tile->SetTile(fWorkGrid->TileAt((size * row) + col));
 		    	r.OffsetBy(0, 0);
 				}
 		}
 
 		if ( (size % 2) == 1 ) 
-			r.OffsetBy(50 , -factor2 * fTileSize);
+			r.OffsetBy(fTileSize, fTileSize * -0.5);
 		else
-			r.OffsetBy(50,0);
+			r.OffsetBy(fTileSize, 0);
 			
 		for(uint8 col=0; col<size; col++)
 		{
@@ -378,10 +384,11 @@ void MainWindow::GenerateGrid(uint8 size)
 			fBack->AddChild(tile);
 			
 		    if ( (col % 2) == 1 ) { 
-				r.OffsetBy(((fTileSize * factor1) + fTileSize * 0), -factor2 * fTileSize);
+				r.OffsetBy(((fTileSize * factor1) + fTileSize * 0.1), fTileSize * -factor2 - fTileSize * 0.1);
 				tile->SetTile(fGrid->TileAt((size * row) + col));
+	 		   	r.OffsetBy(0, 0);
 		    } else {
-		    	r.OffsetBy(((fTileSize * factor1) + fTileSize * 0), (factor2 * fTileSize));
+		    	r.OffsetBy(((fTileSize * factor1) + fTileSize * 0.1), fTileSize * factor2 + fTileSize * 0.1);
 		    	tile->SetTile(fGrid->TileAt((size * row) + col));
 		    	r.OffsetBy(0, 0);
 				}
