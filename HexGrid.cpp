@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2012 Scott McCreary
+ * Copyright 2013 Luke (noryb009)
  * Based on BeVexed by DarkWyrm Copyright 2007-2009
  *
  * Distributed under terms of the MIT License.
