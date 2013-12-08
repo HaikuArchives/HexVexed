@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2012 Scott McCreary
+ * Copyright 2013 Luke (noryb009)
  * Based on BeVexed by DarkWyrm Copyright 2007-2009
  *
  * Distributed under terms of the MIT License.
@@ -319,7 +320,7 @@ void MainWindow::GenerateGrid(uint8 size)
 {
 	const double factor1 = 0.75; //was 0.75 horizontal spacing
 	const double factor2 = 0.433;  //was 0.5 vertical spacing
-	const double factor3 = 1.7;  //was 1.6
+	//const double factor3 = 1.7;  //was 1.6
 	const double offset1 = 70; //was 70
 	const double offset2 = 20;  //was 20 
 	
@@ -345,9 +346,9 @@ void MainWindow::GenerateGrid(uint8 size)
 /*	ResizeTo( ((fTileSize+5) * size * 2) + (fTileSize * 0.5),
 			(  (fTileSize+5) * size ) + fMenuBar->Frame().Height() + (fTileSize * 0.5));
 */
-	ResizeTo( (fTileSize * size * 2) - (fTileSize * 0.5) + 10,
+	ResizeTo( ((fTileSize - 10) * (size - 1) + fTileSize) * 2 + offset1 + offset2 * 2,
 			(  fTileSize * size ) + fMenuBar->Frame().Height() + (fTileSize * 0.5) + 10);
-			
+
 	BRect r(10,
 			fMenuBar->Frame().bottom + 10,
 			10 + fTileSize,

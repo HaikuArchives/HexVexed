@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2012 Scott McCreary
+ * Copyright 2013 Luke (noryb009)
  * Based on BeVexed by DarkWyrm Copyright 2007-2009
  *
  * Distributed under terms of the MIT License.
@@ -35,28 +36,28 @@ void HexTileView::CalcLayout(uint8 tilesize)
 	{
 		case TILESIZE_SMALL:
 		{
-			sFontSize = 14;
+			sFontSize = 13;
 			break;
 		}
 		case TILESIZE_MEDIUM:
 		{
-			sFontSize = 16;
+			sFontSize = 15;
 			break;
 		}
 		case TILESIZE_LARGE:
 		{
-			sFontSize = 20;
+			sFontSize = 19;
 			break;
 		}
 		case TILESIZE_HUGE:
 		{
-			sFontSize = 24;
+			sFontSize = 23;
 			break;
 		}
 		default:
 		{
 			tilesize = TILESIZE_MEDIUM;
-			sFontSize = 16;
+			sFontSize = 15;
 		}
 	}
 
@@ -71,23 +72,23 @@ void HexTileView::CalcLayout(uint8 tilesize)
 	sFontHeight = fh.ascent;
 	sFontWidth = font.StringWidth("0");
 
-	sPoint1.x = (tilesize / 4.0) - sFontWidth;
-	sPoint1.y = (tilesize + sFontHeight) / 2.0;
+	sPoint1.x = (tilesize / 4.0) - (sFontWidth / 2.0);
+	sPoint1.y = (tilesize / 3.0) + (sFontHeight / 2.0) - 1;
 
-	sPoint2.x = sPoint1.x + tilesize;
-	sPoint2.y = sPoint1.y;
+	sPoint2.x = (tilesize - sFontWidth) / 2.0;
+	sPoint2.y = sPoint1.y - (tilesize / 8.0);
 
-	sPoint3.x = sPoint2.x + (tilesize * 0.500);
-	sPoint3.y = sPoint2.y + (tilesize * 0.866);
+	sPoint3.x = (tilesize / 4.0) * 3.0 - (sFontWidth / 2.0);
+	sPoint3.y = sPoint1.y;
 
-	sPoint4.x = sPoint2.x;
-	sPoint4.y = sPoint3.y + (tilesize * 0.866);
+	sPoint4.x = sPoint3.x;
+	sPoint4.y = (tilesize / 3.0) * 2.0 + (sFontHeight / 2.0) - 1;
 
-	sPoint5.x = sPoint1.x;
-	sPoint5.y = sPoint4.y;
+	sPoint5.x = sPoint2.x;
+	sPoint5.y = sPoint4.y + (tilesize / 8.0);
 
-	sPoint6.x = sPoint1.x - (tilesize * .5);
-	sPoint6.y = sPoint3.y;
+	sPoint6.x = sPoint1.x;
+	sPoint6.y = sPoint4.y;
 }
 
 HexTileView::HexTileView(const BPoint &pt, uint8 tilesize, const char *name, const int32 &resize,
@@ -202,7 +203,7 @@ void DrawHexTile(HexTileView *owner, BRect r)
 		owner->StrokeLine(point3, point4);
 		owner->StrokeLine(point4, point5);
 		owner->EndLineArray();
-		// return;
+		return;
 	}
 
 	// frame
@@ -295,8 +296,8 @@ void DrawHexTile(HexTileView *owner, BRect r)
 	owner->DrawString(string.String(),sPoint3);
 
 	string = "";
-	string << (int)owner->GetTile()->bottomleft;
-	numcolor = owner->NumberColor((int)owner->GetTile()->bottomleft);
+	string << (int)owner->GetTile()->bottomright;
+	numcolor = owner->NumberColor((int)owner->GetTile()->bottomright);
 	owner->SetHighColor(numcolor);
 	owner->DrawString(string.String(),sPoint4);
 
@@ -307,8 +308,8 @@ void DrawHexTile(HexTileView *owner, BRect r)
 	owner->DrawString(string.String(),sPoint5);
 
 	string = "";
-	string << (int)owner->GetTile()->bottomright;
-	numcolor = owner->NumberColor((int)owner->GetTile()->bottomright);
+	string << (int)owner->GetTile()->bottomleft;
+	numcolor = owner->NumberColor((int)owner->GetTile()->bottomleft);
 	owner->SetHighColor(numcolor);
 	owner->DrawString(string.String(),sPoint6);
 }
