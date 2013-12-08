@@ -202,7 +202,7 @@ void DrawHexTile(HexTileView *owner, BRect r)
 		owner->StrokeLine(point3, point4);
 		owner->StrokeLine(point4, point5);
 		owner->EndLineArray();
-		//return;
+		return;
 	}
 
 	// frame

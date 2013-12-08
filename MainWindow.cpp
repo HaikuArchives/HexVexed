@@ -319,7 +319,7 @@ void MainWindow::GenerateGrid(uint8 size)
 {
 	const double factor1 = 0.75; //was 0.75 horizontal spacing
 	const double factor2 = 0.433;  //was 0.5 vertical spacing
-	const double factor3 = 1.7;  //was 1.6
+	//const double factor3 = 1.7;  //was 1.6
 	const double offset1 = 70; //was 70
 	const double offset2 = 20;  //was 20 
 	

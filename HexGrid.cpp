@@ -122,28 +122,54 @@ HexGrid::HexGrid(uint8 size)
 
 	fSize = size;
 
+	// create all tiles
+	for(uint8 row=0; row<fSize; row++)
+	{
+		for(uint8 col=0; col<fSize; col++)
+		{
+			HexTile *tile = new HexTile();
+			fTiles.AddItem(tile);
+		}
+	}
+
 	for(uint8 row=0; row<fSize; row++)
 	{
 		uint16 index = row * fSize;
 		for(uint8 col=0; col<fSize; col++)
 		{
-			HexTile *tile = new HexTile();
-			fTiles.AddItem(tile);
-
-			if(col == 0) {
+			HexTile *tile = (HexTile*)(HexTile*)fTiles.ItemAt(index+col);
+			// top
+			if(row == 0) {
+				tile->toptile = NULL;
+			}
+			else
+				tile->toptile = (HexTile*)fTiles.ItemAt(index+col-fSize);
+			
+			// top left
+			if(col == 0 || (row == 0 && col % 2 != 1)) {
 				tile->toplefttile = NULL;
+			}
+			else {
+				if(col % 2 == 1)
+					tile->toplefttile = (HexTile*)fTiles.ItemAt(index+col-1);
+				else
+					tile->toplefttile = (HexTile*)fTiles.ItemAt(index+col-fSize-1);
+			}
+			
+			// bottom left
+			if(col == 0 || (row == fSize-1 && col % 2 != 0)) {
 				tile->bottomlefttile = NULL;
 				}
-			else
-				tile->toplefttile = (HexTile*)fTiles.ItemAt(index + col - 1);
-
-			if(row == 0) {
-				tile->toplefttile = NULL;
-				tile->toptile = NULL;
-				tile->toprighttile = NULL;
-				}
-			else
-				tile->toptile = (HexTile*)fTiles.ItemAt(index + col - fSize);
+			else {
+				if(col % 2 == 0)
+					tile->bottomlefttile = (HexTile*)fTiles.ItemAt(index+col-1);
+				else
+					tile->bottomlefttile = (HexTile*)fTiles.ItemAt(index+col+fSize-1);
+			}
+			
+			tile->toprighttile = NULL;
+			tile->bottomrighttile = NULL;
+			tile->bottomtile = NULL;
 		}
 	}
 	uint16 arraysize = fSize * fSize;
@@ -152,8 +178,8 @@ HexGrid::HexGrid(uint8 size)
 		HexTile *tile = (HexTile*)fTiles.ItemAt(i);
 		if(tile->toplefttile)
 			tile->toplefttile->bottomrighttile = tile;
-		if(tile->toprighttile)
-			tile->toprighttile->bottomlefttile = tile;
+		if(tile->bottomlefttile)
+			tile->bottomlefttile->toprighttile = tile;
 		if(tile->toptile)
 			tile->toptile->bottomtile = tile;
 	}
@@ -178,12 +204,21 @@ void HexGrid::GeneratePuzzle(void)
 		for(uint8 col=0; col<fSize; col++)
 		{
 			tile = (HexTile*)fTiles.ItemAt(index + col);
-			tile->topleft = tile->toplefttile ? tile->toplefttile->bottomright : MKRAND;
-			tile->top = tile->toptile ? tile->toptile->bottom : MKRAND;
-			tile->topright = tile->toprighttile ? tile->toprighttile->bottomleft : MKRAND;
-			tile->topright = MKRAND;
-			tile->bottomleft = MKRAND;
-			tile->bottom = MKRAND;
+			// if there is a tile above and its bottom has a value,
+			tile->top = (tile->toptile && tile->toptile->bottom != -1) ?
+				// get the bottom value. Otherwise, make a random value
+				tile->toptile->bottom : MKRAND;
+			tile->topleft = (tile->toplefttile && tile->toplefttile->bottomright != -1) ?
+				tile->toplefttile->bottomright : MKRAND;
+			tile->topright = (tile->toprighttile && tile->toprighttile->bottomleft != -1) ?
+				tile->toprighttile->bottomleft : MKRAND;
+			
+			tile->bottom = (tile->bottomtile && tile->bottomtile->top != -1) ?
+				tile->bottomtile->top : MKRAND;
+			tile->bottomleft = (tile->bottomlefttile && tile->bottomlefttile->topright != -1) ?
+				tile->bottomlefttile->topright : MKRAND;
+			tile->bottomright = (tile->bottomrighttile && tile->bottomrighttile->topleft != -1) ?
+				tile->bottomrighttile->topleft : MKRAND;
 			tile->id = id++;
 		}
 	}
