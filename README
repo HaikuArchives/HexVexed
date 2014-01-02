@@ -1,9 +1,9 @@
 HexVexed
 
 A Hexagon game based on DarmWaym's BeVexed, a maddeningly-addictive puzzle game, which was inspired by the Linux game TetraVex.
-
-If you've ever heard of a game called TetraVex, you will find this wonderful little time waster all too familiar. The concept is simple: put the hexagon tiles in the grid on the left such that the numbers match wherever 2 tiles touch.
+The concept is simple: put the hexagon tiles in the grid on the left such that the numbers match wherever 2 tiles touch.
 
 About This Version
-
-This is a not-yet-working of a hacked version of DarkWyrm's code to support 6 sides instead of four.  The plan is to same day get this working.  If you have ideas regarding fixes and/or new features, you can email them to scottmc2@gmail.com
+This is a hexagon based tile puzzle game forked from DarkWyrm's BeVexed code to support 6 sides instead of four.  
+The code words but the gameboard isn't yet ready for prime time.
+If you have ideas regarding fixes and/or new features, you can email them to scottmc2@gmail.com
