@@ -319,7 +319,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 void MainWindow::GenerateGrid(uint8 size)
 {
 	const double factor1 = 0.75; //was 0.75 horizontal spacing
-	const double factor2 = 0.433;  //was 0.5 vertical spacing
+	const double factor2 = 0.425;  //was 0.433 vertical spacing
 	//const double factor3 = 1.7;  //was 1.6
 	const double offset1 = 70; //was 70
 	const double offset2 = 20;  //was 20 
@@ -347,7 +347,7 @@ void MainWindow::GenerateGrid(uint8 size)
 			(  (fTileSize+5) * size ) + fMenuBar->Frame().Height() + (fTileSize * 0.5));
 */
 	ResizeTo( ((fTileSize - 10) * (size - 1) + fTileSize) * 2 + offset1 + offset2 * 2,
-			(  fTileSize * size ) + fMenuBar->Frame().Height() + (fTileSize * 0.5) + 10);
+			(  fTileSize * size ) + fMenuBar->Frame().Height() + (fTileSize * 0.866) + 10);
 
 	BRect r(10,
 			fMenuBar->Frame().bottom + 10,
@@ -363,11 +363,11 @@ void MainWindow::GenerateGrid(uint8 size)
 			fBack->AddChild(tile);
 
 		    if ( (col % 2) == 1 ) { 
-		    	r.OffsetBy(((fTileSize * factor1) + fTileSize * 0.1), fTileSize * -factor2 - fTileSize * 0.1); 
+		    	r.OffsetBy(((fTileSize * factor1) + fTileSize * 0.1), -(fTileSize * factor2 + fTileSize * 0.125) +1); //was 0.1
 		    	tile->SetTile(fWorkGrid->TileAt((size * row) + col));
 	    		r.OffsetBy(0, 0);
 			} else {
-		    	r.OffsetBy(((fTileSize * factor1) + fTileSize * 0.1), fTileSize * factor2 + fTileSize * 0.1);
+		    	r.OffsetBy(((fTileSize * factor1) + fTileSize * 0.1), fTileSize * factor2 + fTileSize * 0.125); //was 0.1
 		    	tile->SetTile(fWorkGrid->TileAt((size * row) + col));
 		    	r.OffsetBy(0, 0);
 				}

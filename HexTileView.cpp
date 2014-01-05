@@ -165,7 +165,8 @@ void DrawHexTile(HexTileView *owner, BRect r)
 	                            { 255,255,255,255 } };  //White
 
 	rgb_color numcolor;
-	BPoint hexagoncenter, point1, point2, point3, point4, point5, point6, linesize;
+	BPoint 	point1, point2, point3, point4, point5, point6,
+			hexagoncenter, linesize;
 
 	hexagoncenter.x = (r.RightTop().x-r.LeftTop().x)/2;
 	hexagoncenter.y = (r.LeftBottom().y-r.LeftTop().y)/2;
@@ -185,9 +186,12 @@ void DrawHexTile(HexTileView *owner, BRect r)
 	point6.x = (hexagoncenter.x - linesize.x);
 	point6.y = (hexagoncenter.y);
 
-	owner->SetHighColor(base);
-	// owner->FillRect(owner->Bounds());
+	// make bounding rect transparent
+	owner->SetDrawingMode(B_OP_ALPHA);
+	owner->SetHighColor(B_TRANSPARENT_COLOR);
+	owner->FillRect(owner->Bounds());	
 
+	owner->SetHighColor(base);
 	owner->SetDrawingMode(B_OP_COPY);
 
 	if(owner->GetTile()->IsEmpty())
@@ -204,17 +208,8 @@ void DrawHexTile(HexTileView *owner, BRect r)
 		owner->StrokeLine(point3, point4);
 		owner->StrokeLine(point4, point5);
 		owner->EndLineArray();
-		owner->SetDrawingMode(B_OP_ALPHA);
-		owner->SetHighColor(B_TRANSPARENT_COLOR);
-		owner->FillRect(owner->Bounds());
-
 		return;
 	}
-
-	owner->SetDrawingMode(B_OP_ALPHA);
-	owner->SetHighColor(B_TRANSPARENT_COLOR);
-	owner->FillRect(owner->Bounds());
-
 
 	// frame
 	owner->SetHighColor(highlight);
