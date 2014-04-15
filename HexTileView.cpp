@@ -110,7 +110,7 @@ HexTileView::HexTileView(const BPoint &pt, uint8 tilesize, const char *name, con
 
 void HexTileView::Draw(BRect r)
 {
-	DrawHexTile(this,Bounds());
+	DrawHexTile(this,Bounds(), true);
 }
 
 rgb_color HexTileView::NumberColor(int num)
@@ -136,7 +136,7 @@ rgb_color HexTileView::NumberColor(int num)
     return black;
 }
 
-void DrawHexTile(HexTileView *owner, BRect r)
+void DrawHexTile(HexTileView *owner, BRect r, bool lockedIn)
 {
 /*      points 1-6 are as shown here
           1_____2
@@ -187,9 +187,15 @@ void DrawHexTile(HexTileView *owner, BRect r)
 	point6.y = (hexagoncenter.y);
 
 	// make bounding rect transparent
-	owner->SetDrawingMode(B_OP_ALPHA);
-	owner->SetHighColor(B_TRANSPARENT_COLOR);
-	owner->FillRect(owner->Bounds());	
+
+	owner->SetDrawingMode(B_OP_COPY);
+
+	if(!lockedIn) {
+		owner->SetHighColor(B_TRANSPARENT_COLOR);
+		owner->FillRect(owner->Bounds());
+	} else {
+		owner->SetLowColor(owner->Parent()->LowColor());
+	}
 
 	owner->SetHighColor(base);
 	owner->SetDrawingMode(B_OP_COPY);
@@ -371,7 +377,7 @@ void HexTileView::MessageReceived(BMessage *msg)
 
 void HexTileView::DoDrag(void)
 {
-	BBitmap *bitmap = new BBitmap(Bounds(),B_RGB32, true);
+	BBitmap *bitmap = new BBitmap(Bounds(),B_RGBA32, true);
 	HexTileView *view = new HexTileView(BPoint(0,0),(uint8)Bounds().IntegerWidth(),NULL,0,0);
 	view->SetTile(GetTile());
 	bitmap->AddChild(view);
@@ -380,11 +386,11 @@ void HexTileView::DoDrag(void)
 	BFont font;
 	GetFont(&font);
 	view->SetFont(&font);
-	DrawHexTile(view,Bounds());
+	DrawHexTile(view, Bounds(), false);
 	view->Sync();
 	bitmap->Unlock();
 
 	BMessage msg(B_SIMPLE_DATA);
 	msg.AddPointer("view",this);
-	DragMessage(&msg,bitmap,B_OP_BLEND,BPoint(Bounds().Width()/2,Bounds().Height()/2));
+	DragMessage(&msg,bitmap,B_OP_OVER,BPoint(Bounds().Width()/2,Bounds().Height()/2));
 }

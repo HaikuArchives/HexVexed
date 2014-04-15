@@ -47,6 +47,6 @@ private:
 	HexTile *fTile;
 };
 
-void DrawHexTile(HexTileView *owner, BRect r);
+void DrawHexTile(HexTileView *owner, BRect r, bool lockedIn);
 
 #endif
