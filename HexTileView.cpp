@@ -106,16 +106,14 @@ HexTileView::HexTileView(const BPoint &pt, uint8 tilesize, const char *name, con
 	BFont font(be_bold_font);
 	font.SetSize(sFontSize);
 	SetFont(&font);
-	
-	SetDrawingMode(B_OP_SUBTRACT);
-	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+	SetViewColor(B_TRANSPARENT_COLOR);
 }
 
 void HexTileView::AttachedToWindow()
 {
-	if(Parent() == NULL)
-		return;
-	SetViewColor(Parent()->ViewColor());
+	//if(Parent() == NULL)
+	//	return;
+	//SetViewColor(Parent()->ViewColor());
 }
 
 void HexTileView::Draw(BRect r)

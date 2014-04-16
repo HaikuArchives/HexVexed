@@ -75,10 +75,10 @@ MainWindow::MainWindow(void)
 		gPreferences.AddInt8("tilesize",TILESIZE_MEDIUM);
 	}
 
-	fBack = new BView(Bounds(),"background",B_FOLLOW_ALL,B_WILL_DRAW);
+	fBack = new BackView(Bounds(),"background",B_FOLLOW_ALL,B_WILL_DRAW | B_DRAW_ON_CHILDREN);
 	AddChild(fBack);
 	rgb_color randa = {rand() % 255, rand() % 255, rand() % 255, 255};
-	fBack->SetViewColor(randa);
+	fBack->SetViewColor(B_TRANSPARENT_COLOR);
 
 	fMenuBar = new BMenuBar(BRect(0,0,Bounds().Width(),20),"menubar");
 	fBack->AddChild(fMenuBar);
