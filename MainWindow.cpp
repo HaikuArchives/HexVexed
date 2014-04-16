@@ -144,7 +144,7 @@ MainWindow::MainWindow(void)
 	menu->AddItem(new BMenuItem("How to Play…",new BMessage(M_HOW_TO_PLAY)));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("About HexVexed…",new BMessage(B_ABOUT_REQUESTED)));
-	GenerateGrid(fGridSize);
+	GenerateGrid(fGridSize, true);
 
 	BPoint corner;
 	if(gPreferences.FindPoint("corner",&corner)!=B_OK)
@@ -182,7 +182,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 		}
 		case M_NEW_GAME:
 		{
-			GenerateGrid(fGridSize);
+			GenerateGrid(fGridSize, true);
 			break;
 		}
 		case M_SMALL_TILES:
@@ -190,7 +190,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 			fTileSize = TILESIZE_SMALL;
 			gPreferences.ReplaceInt8("tilesize",TILESIZE_SMALL);
 			HexTileView::CalcLayout(fTileSize);
-			GenerateGrid(fGridSize);
+			GenerateGrid(fGridSize, false);
 			break;
 		}
 		case M_MEDIUM_TILES:
@@ -198,7 +198,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 			fTileSize = TILESIZE_MEDIUM;
 			gPreferences.ReplaceInt8("tilesize",TILESIZE_MEDIUM);
 			HexTileView::CalcLayout(fTileSize);
-			GenerateGrid(fGridSize);
+			GenerateGrid(fGridSize, false);
 			break;
 		}
 		case M_LARGE_TILES:
@@ -206,7 +206,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 			fTileSize = TILESIZE_LARGE;
 			gPreferences.ReplaceInt8("tilesize",TILESIZE_LARGE);
 			HexTileView::CalcLayout(fTileSize);
-			GenerateGrid(fGridSize);
+			GenerateGrid(fGridSize, false);
 			break;
 		}
 		case M_HUGE_TILES:
@@ -214,42 +214,42 @@ void MainWindow::MessageReceived(BMessage *msg)
 			fTileSize = TILESIZE_HUGE;
 			gPreferences.ReplaceInt8("tilesize",TILESIZE_LARGE);
 			HexTileView::CalcLayout(fTileSize);
-			GenerateGrid(fGridSize);
+			GenerateGrid(fGridSize, false);
 			break;
 		}
 		case M_SET_TILE_COUNT_3:
 		{
 			fGridSize = 3;
 			gPreferences.ReplaceInt8("gridsize",3);
-			GenerateGrid(fGridSize);
+			GenerateGrid(fGridSize, true);
 			break;
 		}
 		case M_SET_TILE_COUNT_4:
 		{
 			fGridSize = 4;
 			gPreferences.ReplaceInt8("gridsize",4);
-			GenerateGrid(fGridSize);
+			GenerateGrid(fGridSize, true);
 			break;
 		}
 		case M_SET_TILE_COUNT_5:
 		{
 			fGridSize = 5;
 			gPreferences.ReplaceInt8("gridsize",5);
-			GenerateGrid(fGridSize);
+			GenerateGrid(fGridSize, true);
 			break;
 		}
 		case M_SET_TILE_COUNT_6:
 		{
 			fGridSize = 6;
 			gPreferences.ReplaceInt8("gridsize",6);
-			GenerateGrid(fGridSize);
+			GenerateGrid(fGridSize, true);
 			break;
 		}
 		case M_SET_TILE_COUNT_7:
 		{
 			fGridSize = 7;
 			gPreferences.ReplaceInt8("gridsize",7);
-			GenerateGrid(fGridSize);
+			GenerateGrid(fGridSize, true);
 			break;
 		}
 		case M_SET_BACKGROUND:
@@ -302,7 +302,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 					{
 						ImageAlert *alert = new ImageAlert("HexVexedYouWin.jpg",'JPEG');
 						alert->Show();
-						GenerateGrid(fGridSize);
+						GenerateGrid(fGridSize, true);
 					}
 				}
 			}
@@ -316,7 +316,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 	}
 }
 
-void MainWindow::GenerateGrid(uint8 size)
+void MainWindow::GenerateGrid(uint8 size, bool newGame)
 {
 	const double factor1 = 0.75; //was 0.75 horizontal spacing
 	const double factor2 = 0.425;  //was 0.433 vertical spacing
@@ -324,7 +324,7 @@ void MainWindow::GenerateGrid(uint8 size)
 	const double offset1 = 70; //was 70
 	const double offset2 = 20;  //was 20 
 	
-	if(fGrid)
+	if(fGrid && newGame)
 	{
 		delete fGrid;
 		delete fWorkGrid;
@@ -338,10 +338,12 @@ void MainWindow::GenerateGrid(uint8 size)
 		delete child;
 	}
 	fBack->AddChild(fMenuBar);
-
-	fGrid = new HexGrid(size);
-	fGrid->GeneratePuzzle();
-	fWorkGrid = new HexGrid(size);
+	if(newGame)
+	{
+		fGrid = new HexGrid(size);
+		fGrid->GeneratePuzzle();
+		fWorkGrid = new HexGrid(size);
+	}
 
 /*	ResizeTo( ((fTileSize+5) * size * 2) + (fTileSize * 0.5),
 			(  (fTileSize+5) * size ) + fMenuBar->Frame().Height() + (fTileSize * 0.5));

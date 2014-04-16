@@ -23,7 +23,7 @@ public:
 	void	MessageReceived(BMessage *msg);
 	
 private:
-	void	GenerateGrid(uint8 size);
+	void	GenerateGrid(uint8 size, bool newGame);
 	void	ScanBackgrounds(void);
 	void	SetBackground(const char *name);
 	
