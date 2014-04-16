@@ -198,11 +198,12 @@ void DrawHexTile(HexTileView *owner, BRect r, bool lockedIn)
 
 	owner->SetDrawingMode(B_OP_COPY);
 
-	if(!lockedIn) {
+	if(!lockedIn)
+	{
 		owner->SetHighColor(B_TRANSPARENT_COLOR);
 		owner->FillRect(owner->Bounds());
 	}
-
+	
 	owner->SetHighColor(base);
 	owner->SetDrawingMode(B_OP_COPY);
 

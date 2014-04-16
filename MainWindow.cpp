@@ -406,6 +406,8 @@ void MainWindow::GenerateGrid(uint8 size, bool newGame)
 		else
 			r.OffsetBy(-(r.left - 10), fTileSize);
 	}
+
+	fBack->Invalidate();
 }
 
 void MainWindow::ScanBackgrounds(void)

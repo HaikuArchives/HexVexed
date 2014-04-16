@@ -9,12 +9,16 @@
 #define MAINWIN_H
 
 #include <Application.h>
+#include <Bitmap.h>
 #include <Screen.h>
 #include <Window.h>
 #include <MenuBar.h>
 #include <Rect.h>
 #include <String.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <TranslationUtils.h>
+
 class HexGrid;
 
 class BackView : public BView
@@ -23,6 +27,7 @@ public:
 	BackView(BRect r, const char* t, uint32 fl, uint32 fl2)
 	: BView(r, t, fl, fl2) {
 		fBackgroundColor = BScreen().DesktopColor();
+		bitmap = BTranslationUtils::GetBitmap("/boot/home/hexvexed/background.png");
 		}
 	
 	
@@ -30,8 +35,8 @@ public:
 	void Draw(BRect rect) {
 		SetHighColor(fBackgroundColor);
 		FillRect(Bounds());
+		DrawBitmap(bitmap, bitmap->Bounds(), Bounds());
 		SetLowColor(fBackgroundColor);
-		BView::Draw(rect);
 	}
 	
 	void	SetBackgroundColor(rgb_color color) {
@@ -45,6 +50,7 @@ public:
 
 private:
 	rgb_color fBackgroundColor;
+	BBitmap *bitmap;
 };
 
 class MainWindow : public BWindow
