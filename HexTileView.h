@@ -37,6 +37,8 @@ public:
 	void MouseUp(BPoint where);
 	void MessageReceived(BMessage *msg);
 
+	void AttachedToWindow();
+
 	static void CalcLayout(uint8 hextilesize);
 
 private:

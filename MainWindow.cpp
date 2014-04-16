@@ -12,6 +12,7 @@
 #include <Menu.h>
 #include <MenuItem.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <Alert.h>
 #include <Bitmap.h>
 #include <TranslationUtils.h>
@@ -76,7 +77,8 @@ MainWindow::MainWindow(void)
 
 	fBack = new BView(Bounds(),"background",B_FOLLOW_ALL,B_WILL_DRAW);
 	AddChild(fBack);
-	fBack->SetViewColor(beos_blue);
+	rgb_color randa = {rand() % 255, rand() % 255, rand() % 255, 255};
+	fBack->SetViewColor(randa);
 
 	fMenuBar = new BMenuBar(BRect(0,0,Bounds().Width(),20),"menubar");
 	fBack->AddChild(fMenuBar);
@@ -363,6 +365,7 @@ void MainWindow::GenerateGrid(uint8 size, bool newGame)
 			HexTileView *tile = new HexTileView(r.LeftTop(),fTileSize,"tile",
 											B_FOLLOW_NONE,B_WILL_DRAW);
 			fBack->AddChild(tile);
+			tile->Invalidate(tile->Bounds());
 
 		    if ( (col % 2) == 1 ) { 
 		    	r.OffsetBy(((fTileSize * factor1) + fTileSize * 0.1), -(fTileSize * factor2 + fTileSize * 0.125) +1); //was 0.1
@@ -385,6 +388,7 @@ void MainWindow::GenerateGrid(uint8 size, bool newGame)
 			HexTileView *tile = new HexTileView(r.LeftTop(),fTileSize,"tile",
 											B_FOLLOW_NONE,B_WILL_DRAW);
 			fBack->AddChild(tile);
+			tile->Invalidate(tile->Bounds());
 			
 		    if ( (col % 2) == 1 ) { 
 				r.OffsetBy(((fTileSize * factor1) + fTileSize * 0.1), fTileSize * -factor2 - fTileSize * 0.1);
