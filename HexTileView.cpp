@@ -353,8 +353,20 @@ void HexTileView::MessageReceived(BMessage *msg)
 	if(msg->WasDropped())
 	{
 		HexTileView *view;
+
 		if(msg->FindPointer("view",(void**)&view)!=B_OK)
 			return;
+
+		thread_info info;
+		get_thread_info(find_thread(NULL), &info);
+		team_id thisTeam = info.team;
+		team_id tileTeam;
+
+		if(msg->FindInt32("teamid", (int32*)&tileTeam) != B_OK)
+			return;
+		if(thisTeam != tileTeam)
+			return;
+
 
 		if(!fTile->IsEmpty())
 			return;
@@ -392,5 +404,10 @@ void HexTileView::DoDrag(void)
 
 	BMessage msg(B_SIMPLE_DATA);
 	msg.AddPointer("view",this);
+
+	thread_info info;
+	get_thread_info(find_thread(NULL), &info);
+	msg.AddInt32("teamid", info.team);
+
 	DragMessage(&msg,bitmap,B_OP_OVER,BPoint(Bounds().Width()/2,Bounds().Height()/2));
 }
