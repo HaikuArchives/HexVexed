@@ -11,14 +11,15 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <PathFinder.h>
 #include <string>
 #include <Roster.h>
 #include <Application.h>
 #include <Path.h>
 
-BLocker prefsLock;
-BMessage gPreferences;
-BString gAppPath;
+BLocker Preferences::fPrefsLock;
+BPath Preferences::fPrefsPath;
+BMessage Preferences::fPreferences;
 
 void ConstrainWindowFrameToScreen(BRect *rect)
 {
@@ -59,56 +60,68 @@ void ConstrainWindowFrameToScreen(BRect *rect)
 		rect->bottom = screenframe.bottom - 5;
 }
 
-status_t SavePreferences(const char *path)
+
+void
+Preferences::Init()
 {
-	if(!path)
-		return B_ERROR;
-	
-	prefsLock.Lock();
-	
-	BFile file(path,B_READ_WRITE | B_ERASE_FILE | B_CREATE_FILE);
-	
-	status_t status=file.InitCheck();
-	if(status!=B_OK)
-	{
-		prefsLock.Unlock();
-		return status;
-	}
-	
-	status=gPreferences.Flatten(&file);
-	prefsLock.Unlock();
-	return status;
+	BPathFinder finder;
+	finder.FindPath(B_FIND_PATH_SETTINGS_DIRECTORY, "HexVexed",
+		B_FIND_PATH_CREATE_PARENT_DIRECTORY, fPrefsPath);
 }
 
-status_t LoadPreferences(const char *path)
+
+status_t
+Preferences::Save()
 {
-	if(!path)
+	if (!fPrefsLock.IsLocked())
 		return B_ERROR;
 	
-	prefsLock.Lock();
-
-	app_info ai;
-	be_app->GetAppInfo(&ai);
-	BPath pathobj(&ai.ref);
-	gAppPath = pathobj.Path();
-	gAppPath.RemoveLast(pathobj.Leaf());
+	BFile prefsFile(fPrefsPath.Path(), B_READ_WRITE | B_ERASE_FILE | B_CREATE_FILE);
 	
-	BFile file(path,B_READ_ONLY);
-
-	BMessage msg;
+	status_t status = prefsFile.InitCheck();
 	
-	status_t status=file.InitCheck();
-	if(status!=B_OK)
-	{
-		prefsLock.Unlock();
+	if (status != B_OK)
 		return status;
-	}
 	
-	status=msg.Unflatten(&file);
-	if(status==B_OK)
-		gPreferences=msg;
-		
-	prefsLock.Unlock();
-	return status;
+	return fPreferences.Flatten(&prefsFile);
+}
+
+
+status_t
+Preferences::Load()
+{
+	if(!fPrefsLock.IsLocked())
+		return B_ERROR;
+
+	BFile prefsFile(fPrefsPath.Path(), B_READ_ONLY);
 	
+	status_t status = prefsFile.InitCheck();
+
+	if (status != B_OK)
+		return status;
+	
+	return fPreferences.Unflatten(&prefsFile);	
+}
+
+
+status_t
+Preferences::LockPreferences()
+{
+	return fPrefsLock.Lock();
+}
+
+
+void
+Preferences::UnlockPreferences()
+{
+	fPrefsLock.Unlock();
+}
+
+
+BMessage &
+Preferences::Message()
+{
+	if(!fPrefsLock.IsLocked())
+		return *(BMessage *)NULL;
+	return fPreferences;
 }

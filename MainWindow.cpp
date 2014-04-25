@@ -61,18 +61,20 @@ MainWindow::MainWindow(void)
 	fBackPath << "/";
 
 	static const rgb_color beos_blue = {51,102,152,255};
-	LoadPreferences(PREFERENCES_PATH);
+	Preferences::Init();
+	Preferences::LockPreferences();
+	Preferences::Load();
 
-	if(gPreferences.FindInt8("gridsize",(int8*)&fGridSize)!=B_OK)
+	if(Preferences::Message().FindInt8("gridsize",(int8*)&fGridSize)!=B_OK)
 	{
 		fGridSize = 3;
-		gPreferences.AddInt8("gridsize",3);
+		Preferences::Message().AddInt8("gridsize",3);
 	}
 
-	if(gPreferences.FindInt8("tilesize",(int8*)&fTileSize)!=B_OK)
+	if(Preferences::Message().FindInt8("tilesize",(int8*)&fTileSize)!=B_OK)
 	{
 		fTileSize = TILESIZE_MEDIUM;
-		gPreferences.AddInt8("tilesize",TILESIZE_MEDIUM);
+		Preferences::Message().AddInt8("tilesize",TILESIZE_MEDIUM);
 	}
 
 	fBack = new BackView(Bounds(),"background",B_FOLLOW_ALL,B_WILL_DRAW | B_DRAW_ON_CHILDREN);
@@ -149,10 +151,10 @@ MainWindow::MainWindow(void)
 	GenerateGrid(fGridSize, true);
 
 	BPoint corner;
-	if(gPreferences.FindPoint("corner",&corner)!=B_OK)
+	if(Preferences::Message().FindPoint("corner",&corner)!=B_OK)
 	{
 		corner = Frame().LeftTop();
-		gPreferences.AddPoint("corner",Frame().LeftTop());
+		Preferences::Message().AddPoint("corner",Frame().LeftTop());
 	}
 
 	BRect r(Frame());
@@ -160,20 +162,26 @@ MainWindow::MainWindow(void)
 	ConstrainWindowFrameToScreen(&r);
 	MoveTo(r.left,r.top);
 
-	if(gPreferences.FindString("background",&fBackName) == B_OK)
+	if(Preferences::Message().FindString("background",&fBackName) == B_OK)
 		SetBackground(fBackName.String());
+
+	Preferences::UnlockPreferences();
 }
 
 bool MainWindow::QuitRequested(void)
 {
-	gPreferences.ReplacePoint("corner",Frame().LeftTop());
-	SavePreferences(PREFERENCES_PATH);
+	Preferences::LockPreferences();
+	Preferences::Message().ReplacePoint("corner",Frame().LeftTop());
+	Preferences::Save();
+	Preferences::UnlockPreferences();
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
 }
 
 void MainWindow::MessageReceived(BMessage *msg)
 {
+	Preferences::LockPreferences();
+
 	switch(msg->what)
 	{
 		case B_ABOUT_REQUESTED:
@@ -190,7 +198,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 		case M_SMALL_TILES:
 		{
 			fTileSize = TILESIZE_SMALL;
-			gPreferences.ReplaceInt8("tilesize",TILESIZE_SMALL);
+			Preferences::Message().ReplaceInt8("tilesize",TILESIZE_SMALL);
 			HexTileView::CalcLayout(fTileSize);
 			GenerateGrid(fGridSize, false);
 			break;
@@ -198,7 +206,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 		case M_MEDIUM_TILES:
 		{
 			fTileSize = TILESIZE_MEDIUM;
-			gPreferences.ReplaceInt8("tilesize",TILESIZE_MEDIUM);
+			Preferences::Message().ReplaceInt8("tilesize",TILESIZE_MEDIUM);
 			HexTileView::CalcLayout(fTileSize);
 			GenerateGrid(fGridSize, false);
 			break;
@@ -206,7 +214,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 		case M_LARGE_TILES:
 		{
 			fTileSize = TILESIZE_LARGE;
-			gPreferences.ReplaceInt8("tilesize",TILESIZE_LARGE);
+			Preferences::Message().ReplaceInt8("tilesize",TILESIZE_LARGE);
 			HexTileView::CalcLayout(fTileSize);
 			GenerateGrid(fGridSize, false);
 			break;
@@ -214,7 +222,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 		case M_HUGE_TILES:
 		{
 			fTileSize = TILESIZE_HUGE;
-			gPreferences.ReplaceInt8("tilesize",TILESIZE_LARGE);
+			Preferences::Message().ReplaceInt8("tilesize",TILESIZE_LARGE);
 			HexTileView::CalcLayout(fTileSize);
 			GenerateGrid(fGridSize, false);
 			break;
@@ -222,35 +230,35 @@ void MainWindow::MessageReceived(BMessage *msg)
 		case M_SET_TILE_COUNT_3:
 		{
 			fGridSize = 3;
-			gPreferences.ReplaceInt8("gridsize",3);
+			Preferences::Message().ReplaceInt8("gridsize",3);
 			GenerateGrid(fGridSize, true);
 			break;
 		}
 		case M_SET_TILE_COUNT_4:
 		{
 			fGridSize = 4;
-			gPreferences.ReplaceInt8("gridsize",4);
+			Preferences::Message().ReplaceInt8("gridsize",4);
 			GenerateGrid(fGridSize, true);
 			break;
 		}
 		case M_SET_TILE_COUNT_5:
 		{
 			fGridSize = 5;
-			gPreferences.ReplaceInt8("gridsize",5);
+			Preferences::Message().ReplaceInt8("gridsize",5);
 			GenerateGrid(fGridSize, true);
 			break;
 		}
 		case M_SET_TILE_COUNT_6:
 		{
 			fGridSize = 6;
-			gPreferences.ReplaceInt8("gridsize",6);
+			Preferences::Message().ReplaceInt8("gridsize",6);
 			GenerateGrid(fGridSize, true);
 			break;
 		}
 		case M_SET_TILE_COUNT_7:
 		{
 			fGridSize = 7;
-			gPreferences.ReplaceInt8("gridsize",7);
+			Preferences::Message().ReplaceInt8("gridsize",7);
 			GenerateGrid(fGridSize, true);
 			break;
 		}
@@ -316,6 +324,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 		default:
 			BWindow::MessageReceived(msg);
 	}
+	Preferences::UnlockPreferences();
 }
 
 void MainWindow::GenerateGrid(uint8 size, bool newGame)
@@ -442,12 +451,15 @@ void MainWindow::ScanBackgrounds(void)
 
 void MainWindow::SetBackground(const char *name)
 {
+	Preferences::LockPreferences();
+
 	if (!name || strlen(name) == 0)
 	{
 		fBack->ClearViewBitmap();
 		fBack->Invalidate();
 		fBackName = "";
-		gPreferences.RemoveData("background");
+		Preferences::Message().RemoveData("background");
+		Preferences::UnlockPreferences();
 		return;
 	}
 
@@ -459,8 +471,9 @@ void MainWindow::SetBackground(const char *name)
 		fBack->SetViewBitmap(bmp);
 		delete bmp;
 		fBackName = name;
-		gPreferences.RemoveData("background");
-		gPreferences.AddString("background",fBackName);
+		Preferences::Message().RemoveData("background");
+		Preferences::Message().AddString("background", fBackName);
 		fBack->Invalidate();
 	}
+	Preferences::UnlockPreferences();
 }
