@@ -8,6 +8,7 @@
  */
 
 #include "HexTileView.h"
+#include "HexTile.h"
 #include <Font.h>
 #include <Bitmap.h>
 #include <String.h>

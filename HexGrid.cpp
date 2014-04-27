@@ -31,90 +31,17 @@
 
 */
 
+#include "HexTile.h"
 #include "HexGrid.h"
 #include <OS.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "HexTileView.h"
 
-//#define TESTMODE 1
+#define RAND(_min_, _max_) ({ uint8 low = _min_; uint8 high = _max_; rand() % (high-low) + low; })
 
-#define MKRAND 	uint8(float(rand()) / RAND_MAX * 10)
+#define MKRAND RAND(0, 10)
 
-HexTile::HexTile(void)
- :	topleft(-1),
- 	top(-1),
- 	topright(-1),
-	bottomleft(-1),
- 	bottom(-1),
- 	bottomright(-1),
- 	id(0),
- 	toplefttile(NULL),
- 	toptile(NULL),
- 	toprighttile(NULL),
- 	bottomlefttile(NULL),
- 	bottomtile(NULL),
- 	bottomrighttile(NULL)
-{
-	SetValues(-1,-1,-1,-1,-1,-1);
-	id=0;
-}
-
-HexTile::HexTile(const uint8 &tl, const uint8 &t, const uint8 &tr, 
-				 const uint8 &bl, const uint8 &b, const uint8 &br)
- :	topleft(tl),
- 	top(t),
- 	topright(tr),
-	bottomleft(bl),
- 	bottom(b),
- 	bottomright(br),
- 	id(0),
- 	toplefttile(NULL),
- 	toptile(NULL),
- 	toprighttile(NULL),
- 	bottomlefttile(NULL),
- 	bottomtile(NULL),
- 	bottomrighttile(NULL)
-{
-	id=0;
-}
-
-HexTile::HexTile(const HexTile &t)
- :	topleft(t.topleft),
- 	top(t.top),
- 	topright(t.topright),
-	bottomleft(t.bottomleft),
- 	bottom(t.bottom),
- 	bottomright(t.bottomright),
- 	id(t.id),
- 	toplefttile(NULL),
- 	toptile(NULL),
- 	toprighttile(NULL),
- 	bottomlefttile(NULL),
- 	bottomtile(NULL),
- 	bottomrighttile(NULL)
-{
-	id=t.id;
-}
-
-HexTile &HexTile::operator=(const HexTile &t)
-{
-	SetValues(t.topleft,t.top,t.topright,t.bottomleft,t.bottom,t.bottomright);
-	id=t.id;
-	return *this;
-}
-
-
-void HexTile::SetValues(const uint8 &tl, const uint8 &t, const uint8 &tr, 
-                        const uint8 &bl, const uint8 &b, const uint8 &br)
-{
-	topleft = tl;
-	top = t;
-	topright = tr;
-	bottomleft = bl;
-	bottom = b;
-	bottomright = br;
-}
 
 HexGrid::HexGrid(uint8 size)
 {
@@ -234,7 +161,9 @@ void HexGrid::GeneratePuzzle(void)
 		uint16 indexone = uint16(float(rand()) / RAND_MAX * arraysize);
 		uint16 indextwo = uint16(float(rand()) / RAND_MAX * arraysize);
 
-		fTiles.SwapItems(indexone,indextwo);
+		HexTile *itemone = fTiles.ItemAt(indexone);
+		HexTile *tempitem = fTiles.SwapWithItem(indextwo, itemone);
+		fTiles.SwapWithItem(indexone, tempitem);
 	}
 #endif
 }

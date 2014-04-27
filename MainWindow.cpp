@@ -22,6 +22,7 @@
 #include <Directory.h>
 #include "AboutWindow.h"
 #include "Preferences.h"
+#include "HexTile.h"
 #include "HexTileView.h"
 #include "HexGrid.h"
 #include "ImageAlert.h"
