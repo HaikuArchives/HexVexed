@@ -10,6 +10,7 @@
 #define HEXTILE_H
 
 #include <Archivable.h>
+#include <stdio.h>
 
 class HexTile : public BArchivable
 {
@@ -17,12 +18,7 @@ public:
 	// Archiving stuff!
 	HexTile(BMessage *from);
 	static BArchivable *Instantiate(BMessage *from);
-
-	virtual ~HexTile() {};
-	virtual status_t AllArchived(BMessage *archive) const;
-	virtual status_t AllUnarchived(const BMessage *archive);
 	virtual status_t Archive(BMessage *into, bool deep = true);
-	virtual status_t Perform(perform_code d, void *arg) { return B_ERROR; }
 	
 	// Normal stuff!
 	HexTile(void);
@@ -37,6 +33,10 @@ public:
 	bool IsEmpty(void) const { return (topleft<0 || top<0 || topright<0 || bottomleft<0 || bottom<0 || bottomright<0); }
 	void MakeEmpty(void) { topleft=top=topright=bottomleft=bottom=bottomright=-1; }
 	
+	void PrintToStream(void) { printf("Tile: id = %d, gridid = %d,\ntl = %d, t = %d, tr = %d,\nbl = %d, b = %d, br = %d\n",
+		id, gridid, topleft, top, topright, bottomleft, bottom, bottomright); 
+	} 
+	
 	int8 topleft;
 	int8 top;
 	int8 topright;
@@ -44,6 +44,7 @@ public:
 	int8 bottom;
 	int8 bottomright;
 	uint16 id;
+	uint16 gridid;
 	
 	HexTile *toplefttile,*toptile,*toprighttile,*bottomlefttile,*bottomtile,*bottomrighttile;
 };

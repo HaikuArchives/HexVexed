@@ -16,7 +16,7 @@ class HexTile;
 class HexGrid
 {
 public:
-	HexGrid(uint8 size);
+	HexGrid(uint8 size, uint16 id);
 	~HexGrid(void);
 	
 	uint8 Size(void) const { return fSize; }
@@ -24,11 +24,14 @@ public:
 	HexTile *TileAt(const uint16 &index);
 	bool HasTile(HexTile *t) { return fTiles.HasItem(t); }
 	
-	bool TryTile(HexTile *src, HexTile *dest);
+	static bool TryTile(HexTile *src, HexTile *dest);
 	bool IsSolved(void);
+	
+	uint16 Id() { return fId; }
 private:
 	BObjectList<HexTile> fTiles;
 	uint32 fSize;
+	uint16 fId;
 };
 
 #endif

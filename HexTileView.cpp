@@ -12,6 +12,7 @@
 #include <Font.h>
 #include <Bitmap.h>
 #include <String.h>
+#include <stdio.h>
 #include <Message.h>
 #include <Window.h>
 
@@ -336,12 +337,15 @@ void DrawHexTile(HexTileView *owner, BRect r, bool lockedIn)
 void HexTileView::SetTile(HexTile *tile)
 {
 	fTile = tile;
+	fTile->gridid = fGridId;
 	Invalidate();
 }
 
 void HexTileView::MouseDown(BPoint pt)
 {
 	fMouseDown = true;
+
+	GetTile()->PrintToStream();
 
 	if(!fTile->IsEmpty())
 		DoDrag();
@@ -360,21 +364,11 @@ void HexTileView::MessageReceived(BMessage *msg)
 {
 	if(msg->WasDropped())
 	{
-		HexTileView *view;
+		HexTile *tile = dynamic_cast<HexTile *>(HexTile::Instantiate(msg));
+		printf("Woo: %x\n", tile);
 
-		if(msg->FindPointer("view",(void**)&view)!=B_OK)
+		if(!tile)
 			return;
-
-		thread_info info;
-		get_thread_info(find_thread(NULL), &info);
-		team_id thisTeam = info.team;
-		team_id tileTeam;
-
-		if(msg->FindInt32("teamid", (int32*)&tileTeam) != B_OK)
-			return;
-		if(thisTeam != tileTeam)
-			return;
-
 
 		if(!fTile->IsEmpty())
 			return;
@@ -385,9 +379,11 @@ void HexTileView::MessageReceived(BMessage *msg)
 		if(Window())
 		{
 			BMessage post(M_CHECK_DROP);
-			post.AddPointer("from",view);
-			post.AddPointer("to",this);
+			post.AddPointer("tile", tile);
+			post.AddPointer("to", this);
+			post.PrintToStream();
 			Window()->PostMessage(&post);
+			printf("Check posted!\n");
 		}
 		return;
 	}
@@ -397,25 +393,38 @@ void HexTileView::MessageReceived(BMessage *msg)
 
 void HexTileView::DoDrag(void)
 {
-	BBitmap *bitmap = new BBitmap(Bounds(),B_RGBA32, true);
-	HexTileView *view = new HexTileView(BPoint(0,0),(uint8)Bounds().IntegerWidth(),NULL,0,0);
+	BBitmap *bitmap = new BBitmap(Bounds(), B_RGBA32, true);
+	HexTileView *view = new HexTileView(BPoint(0,0), (uint8) Bounds().IntegerWidth(),NULL,0,0);
 	view->SetTile(GetTile());
+
 	bitmap->AddChild(view);
 	bitmap->Lock();
 
 	BFont font;
 	GetFont(&font);
 	view->SetFont(&font);
+
 	DrawHexTile(view, Bounds(), false);
+
 	view->Sync();
 	bitmap->Unlock();
 
 	BMessage msg(B_SIMPLE_DATA);
-	msg.AddPointer("view",this);
+
+	printf("Tile = %x\n", GetTile());
+
+	if(GetTile()->Archive(&msg) != B_OK)
+		debugger("Archiving failed!");
+
+	GetTile()->MakeEmpty();
+	Invalidate();
 
 	thread_info info;
 	get_thread_info(find_thread(NULL), &info);
 	msg.AddInt32("teamid", info.team);
 
-	DragMessage(&msg,bitmap,B_OP_OVER,BPoint(Bounds().Width()/2,Bounds().Height()/2));
+	msg.PrintToStream();
+
+	DragMessage(&msg, bitmap, B_OP_OVER, 
+		BPoint(Bounds().Width() / 2, Bounds().Height() / 2));
 }

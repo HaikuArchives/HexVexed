@@ -43,11 +43,12 @@
 #define MKRAND RAND(0, 10)
 
 
-HexGrid::HexGrid(uint8 size)
+HexGrid::HexGrid(uint8 size, uint16 id)
 {
 	if(size == 0)
 		debugger("Programmer Error: Grid has 0 tiles");
 
+	fId = id;
 	fSize = size;
 
 	uint16 arraysize = fSize * fSize;
@@ -207,7 +208,7 @@ bool HexGrid::IsSolved(void)
 	for (int32 i = 0; i < fTiles.CountItems(); i++)
 	{
 		HexTile *t = fTiles.ItemAt(i);
-		if(t->id != i || t->IsEmpty())
+		if(t->IsEmpty())
 			return false;
 	}
 	return true;

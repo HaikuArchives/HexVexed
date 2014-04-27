@@ -10,8 +10,7 @@
 
 #include <View.h>
 #include "HexGrid.h"
-
-class HexTile;
+#include "HexTile.h"
 
 #define M_CHECK_DROP 'chdr'
 
@@ -32,6 +31,9 @@ public:
 	void Draw(BRect r);
 	rgb_color NumberColor(int num);
 
+	uint16	GridId() { return fGridId; }
+	void SetGridId(uint16 gridid) { fGridId = gridid; if(fTile) fTile->gridid = gridid; }
+
 	void MouseDown(BPoint where);
 	void MouseMoved(BPoint pt,uint32 code, const BMessage *msg);
 	void MouseUp(BPoint where);
@@ -46,6 +48,7 @@ private:
 	void DoDrag(void);
 
 	bool fMouseDown;
+	uint16 fGridId;
 	HexTile *fTile;
 };
 

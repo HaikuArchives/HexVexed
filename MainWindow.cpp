@@ -285,29 +285,31 @@ void MainWindow::MessageReceived(BMessage *msg)
 		}
 		case M_CHECK_DROP:
 		{
-			HexTileView *from, *to;
-			if(msg->FindPointer("from",(void**)&from)!=B_OK ||
-					msg->FindPointer("to",(void**)&to)!=B_OK)
+			HexTile *tile;
+			HexTileView *to;
+			msg->PrintToStream();
+			if(msg->FindPointer("to",(void**)&to)!=B_OK ||
+					msg->FindPointer("tile",(void**)&tile)!=B_OK)
 				break;
+			tile->PrintToStream();
 
 			// If we're dropping to the storage grid
-			if(fGrid->HasTile(to->GetTile()))
+			if(to->GridId() == fGrid->Id())
 			{
-				*to->GetTile() = *from->GetTile();
-				from->GetTile()->MakeEmpty();
+				printf("To fGrid!\n");
+				*to->GetTile() = *tile;
+				tile->gridid = to->GridId();
+
 				to->Invalidate();
-				from->Invalidate();
 			}
-			else
-			// If we're dropping to the tile grid
-			if(fWorkGrid->HasTile(to->GetTile()))
+			else if(to->GridId() == fWorkGrid->Id())
 			{
-				if(fWorkGrid->TryTile(from->GetTile(),to->GetTile()))
+				if(HexGrid::TryTile(tile, to->GetTile()))
 				{
-					*to->GetTile() = *from->GetTile();
-					from->GetTile()->MakeEmpty();
+					printf("Tile fits!\n");
+					*to->GetTile() = *tile;
+					tile->gridid = to->GridId();
 					to->Invalidate();
-					from->Invalidate();
 
 					if(fWorkGrid->IsSolved())
 					{
@@ -316,6 +318,8 @@ void MainWindow::MessageReceived(BMessage *msg)
 						GenerateGrid(fGridSize, true);
 					}
 				}
+				else
+					printf("Tile doesn't fit!\n");
 			}
 			else
 				debugger("Programmer Error: Orphaned Tile");
@@ -352,9 +356,9 @@ void MainWindow::GenerateGrid(uint8 size, bool newGame)
 	fBack->AddChild(fMenuBar);
 	if(newGame)
 	{
-		fGrid = new HexGrid(size);
+		fGrid = new HexGrid(size, 0);
 		fGrid->GeneratePuzzle();
-		fWorkGrid = new HexGrid(size);
+		fWorkGrid = new HexGrid(size, 1);
 	}
 
 /*	ResizeTo( ((fTileSize+5) * size * 2) + (fTileSize * 0.5),
@@ -374,6 +378,7 @@ void MainWindow::GenerateGrid(uint8 size, bool newGame)
 		{
 			HexTileView *tile = new HexTileView(r.LeftTop(),fTileSize,"tile",
 											B_FOLLOW_NONE,B_WILL_DRAW);
+			tile->SetGridId(fWorkGrid->Id());
 			fBack->AddChild(tile);
 			tile->Invalidate(tile->Bounds());
 
@@ -397,6 +402,7 @@ void MainWindow::GenerateGrid(uint8 size, bool newGame)
 		{
 			HexTileView *tile = new HexTileView(r.LeftTop(),fTileSize,"tile",
 											B_FOLLOW_NONE,B_WILL_DRAW);
+			tile->SetGridId(fGrid->Id());
 			fBack->AddChild(tile);
 			tile->Invalidate(tile->Bounds());
 			

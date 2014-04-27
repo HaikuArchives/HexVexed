@@ -42,7 +42,9 @@
 BArchivable *
 HexTile::Instantiate(BMessage *from)
 {
-	return new HexTile(from);
+	if(validate_instantiation(from, "HexTile"))
+		return new HexTile(from);
+	return NULL;
 }
 
 
@@ -63,40 +65,36 @@ HexTile::HexTile(BMessage *from)
 	bottomrighttile(NULL)
 {
 	SetValues(
-		from->GetInt8("topleft", -1),
-		from->GetInt8("top", -1),
-		from->GetInt8("topright", -1),
-		from->GetInt8("bottomleft", -1),
-		from->GetInt8("bottom", -1),
-		from->GetInt8("bottomright", -1));
-	id = from->GetUInt16("id", 0);
-}
-
-
-status_t
-HexTile::AllArchived(BMessage *archive) const
-{
-	return B_OK;
-}
-
-
-status_t
-HexTile::AllUnarchived(const BMessage *archive)
-{
-	return B_OK;
+		from->GetInt8("HexTile::topleft", -1),
+		from->GetInt8("HexTile::top", -1),
+		from->GetInt8("HexTile::topright", -1),
+		from->GetInt8("HexTile::bottomleft", -1),
+		from->GetInt8("HexTile::bottom", -1),
+		from->GetInt8("HexTile::bottomright", -1));
+	id = from->GetUInt16("HexTile::id", 0);
+	gridid = from->GetUInt16("HexTile::gridid", 0);
 }
 
 
 status_t
 HexTile::Archive(BMessage *into, bool deep)
 {
-	into->AddInt8("topleft", 		topleft);
-	into->AddInt8("top",			top);
-	into->AddInt8("topright",		topright);
-	into->AddInt8("bottomleft", 	bottomleft);
-	into->AddInt8("bottom",			bottom);
-	into->AddInt8("bottomright",	bottomright);
-	into->AddUInt16("id",			id);
+	status_t error;
+
+	error = BArchivable::Archive(into, deep);
+	if(error != B_OK)
+		return error;
+
+	into->AddInt8("HexTile::topleft", 		topleft);
+	into->AddInt8("HexTile::top",			top);
+	into->AddInt8("HexTile::topright",		topright);
+	into->AddInt8("HexTile::bottomleft", 	bottomleft);
+	into->AddInt8("HexTile::bottom",		bottom);
+	into->AddInt8("HexTile::bottomright",	bottomright);
+	into->AddUInt16("HexTile::id",			id);
+	into->AddUInt16("HexTile::gridid",		gridid);
+	
+	return B_OK;
 }
 
 
@@ -108,6 +106,7 @@ HexTile::HexTile(void)
  	bottom(-1),
  	bottomright(-1),
  	id(0),
+ 	gridid(0),
  	toplefttile(NULL),
  	toptile(NULL),
  	toprighttile(NULL),
@@ -133,6 +132,7 @@ HexTile::HexTile(const HexTile &t)
  	bottom(t.bottom),
  	bottomright(t.bottomright),
  	id(t.id),
+ 	gridid(t.id),
  	toplefttile(NULL),
  	toptile(NULL),
  	toprighttile(NULL),
@@ -145,7 +145,9 @@ HexTile::HexTile(const HexTile &t)
 HexTile &HexTile::operator=(const HexTile &t)
 {
 	SetValues(t.topleft,t.top,t.topright,t.bottomleft,t.bottom,t.bottomright);
-	id=t.id;
+	id = t.id;
+	gridid = t.gridid;
+
 	return *this;
 }
 
