@@ -107,7 +107,7 @@ HexGrid::HexGrid(uint8 size)
 
 HexGrid::~HexGrid(void)
 {
-	for(int32 i=0; i<fTiles.CountItems(); i++)
+	for (int32 i = 0; i < fTiles.CountItems(); i++)
 		delete fTiles.ItemAt(i);
 	fTiles.MakeEmpty();
 }
@@ -117,13 +117,13 @@ void HexGrid::GeneratePuzzle(void)
 	HexTile *tile;
 
 	// Generate tiles and index when solved
-	uint16 id=0;
-	for(uint8 row=0; row<fSize; row++)
+	uint16 id = 0;
+	for (uint8 row = 0; row < fSize; row++)
 	{
 		uint16 index = row * fSize;
-		for(uint8 col=0; col<fSize; col++)
+		for (uint8 col = 0; col < fSize; col++)
 		{
-			tile = (HexTile*)fTiles.ItemAt(index + col);
+			tile = fTiles.ItemAt(index + col);
 			// if there is a tile above and its bottom has a value,
 			tile->top = (tile->toptile && tile->toptile->bottom != -1) ?
 				// get the bottom value. Otherwise, make a random value
@@ -147,7 +147,7 @@ void HexGrid::GeneratePuzzle(void)
 	// Now mix them all up
 	uint16 arraysize = (fSize * fSize);
 	uint16 count = arraysize * 4;
-	for(uint8 i=0; i<count; i++)
+	for (uint8 i = 0; i < count; i++)
 	{
 		// swap two random elements
 		uint16 indexone = RAND(0, arraysize);
@@ -162,53 +162,41 @@ void HexGrid::GeneratePuzzle(void)
 
 HexTile *HexGrid::TileAt(const uint16 &index)
 {
-	if(index > (fSize * fSize) - 1)
+	if (index > (fSize * fSize) - 1)
 		debugger("Programmer Error: Tile index too big");
 
-	return (HexTile*)fTiles.ItemAt(index);
+	return fTiles.ItemAt(index);
 }
 
 bool HexGrid::TryTile(HexTile *src, HexTile *dest)
 {
-	if(!src || !dest || src->IsEmpty())
+	if (!src || !dest || src->IsEmpty())
 		return false;
 
 	// Return true if the thing is a valid play
-	if(dest->toplefttile && !dest->toplefttile->IsEmpty())
-	{
-		if(dest->toplefttile != src && dest->toplefttile->bottomright != src->topleft)
+	if (dest->toplefttile && !dest->toplefttile->IsEmpty())
+		if (dest->toplefttile != src && dest->toplefttile->bottomright != src->topleft)
 			return false;
-	}
 
-	if(dest->toptile && !dest->toptile->IsEmpty())
-	{
-		if(dest->toptile != src && dest->toptile->bottom != src->top)
+	if (dest->toptile && !dest->toptile->IsEmpty())
+		if (dest->toptile != src && dest->toptile->bottom != src->top)
 			return false;
-	}
 
-	if(dest->toprighttile && !dest->toprighttile->IsEmpty())
-	{
-		if(dest->toprighttile != src && dest->toprighttile->bottomleft != src->topright)
+	if (dest->toprighttile && !dest->toprighttile->IsEmpty())
+		if (dest->toprighttile != src && dest->toprighttile->bottomleft != src->topright)
 			return false;
-	}
 
-	if(dest->bottomlefttile && !dest->bottomlefttile->IsEmpty())
-	{
-		if(dest->bottomlefttile != src && dest->bottomlefttile->topright != src->bottomleft)
+	if (dest->bottomlefttile && !dest->bottomlefttile->IsEmpty())
+		if (dest->bottomlefttile != src && dest->bottomlefttile->topright != src->bottomleft)
 			return false;
-	}
 
-	if(dest->bottomtile && !dest->bottomtile->IsEmpty())
-	{
-		if(dest->bottomtile != src && dest->bottomtile->top != src->bottom)
+	if (dest->bottomtile && !dest->bottomtile->IsEmpty())
+		if (dest->bottomtile != src && dest->bottomtile->top != src->bottom)
 			return false;
-	}
 
-	if(dest->bottomrighttile && !dest->bottomrighttile->IsEmpty())
-	{
-		if(dest->bottomrighttile != src && dest->bottomrighttile->topleft != src->bottomright)
+	if (dest->bottomrighttile && !dest->bottomrighttile->IsEmpty())
+		if (dest->bottomrighttile != src && dest->bottomrighttile->topleft != src->bottomright)
 			return false;
-	}
 
 	return true;
 }
@@ -216,9 +204,9 @@ bool HexGrid::TryTile(HexTile *src, HexTile *dest)
 bool HexGrid::IsSolved(void)
 {
 	// return true if the puzzle is solved
-	for(int32 i = 0; i < fTiles.CountItems(); i++)
+	for (int32 i = 0; i < fTiles.CountItems(); i++)
 	{
-		HexTile *t = (HexTile*)fTiles.ItemAt(i);
+		HexTile *t = fTiles.ItemAt(i);
 		if(t->id != i || t->IsEmpty())
 			return false;
 	}
