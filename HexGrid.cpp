@@ -50,65 +50,57 @@ HexGrid::HexGrid(uint8 size)
 
 	fSize = size;
 
+	uint16 arraysize = fSize * fSize;
 	// create all tiles
-	for(uint8 row=0; row<fSize; row++)
+	for (uint8 arrno = 0; arrno < arraysize; arrno++)
 	{
-		for(uint8 col=0; col<fSize; col++)
-		{
-			HexTile *tile = new HexTile();
-			fTiles.AddItem(tile);
-		}
+		fTiles.AddItem(new HexTile());
 	}
 
-	for(uint8 row=0; row<fSize; row++)
+	for (uint8 row = 0; row < fSize; row++)
 	{
 		uint16 index = row * fSize;
-		for(uint8 col=0; col<fSize; col++)
+		for (uint8 col = 0; col < fSize; col++)
 		{
-			HexTile *tile = (HexTile*)(HexTile*)fTiles.ItemAt(index+col);
+			HexTile *tile = fTiles.ItemAt(index+col);
 			// top
-			if(row == 0) {
+			if (row == 0)
 				tile->toptile = NULL;
-			}
 			else
-				tile->toptile = (HexTile*)fTiles.ItemAt(index+col-fSize);
+				tile->toptile = fTiles.ItemAt(index+col-fSize);
 			
 			// top left
-			if(col == 0 || (row == 0 && col % 2 != 1)) {
+			if (col == 0 || (row == 0 && col % 2 != 1))
 				tile->toplefttile = NULL;
-			}
-			else {
-				if(col % 2 == 1)
-					tile->toplefttile = (HexTile*)fTiles.ItemAt(index+col-1);
+			else
+				if (col % 2 == 1)
+					tile->toplefttile = fTiles.ItemAt(index+col-1);
 				else
-					tile->toplefttile = (HexTile*)fTiles.ItemAt(index+col-fSize-1);
-			}
+					tile->toplefttile = fTiles.ItemAt(index+col-fSize-1);
 			
 			// bottom left
-			if(col == 0 || (row == fSize-1 && col % 2 != 0)) {
+			if (col == 0 || (row == fSize-1 && col % 2 != 0))
 				tile->bottomlefttile = NULL;
-				}
-			else {
+			else
 				if(col % 2 == 0)
-					tile->bottomlefttile = (HexTile*)fTiles.ItemAt(index+col-1);
+					tile->bottomlefttile = fTiles.ItemAt(index+col-1);
 				else
-					tile->bottomlefttile = (HexTile*)fTiles.ItemAt(index+col+fSize-1);
-			}
+					tile->bottomlefttile = fTiles.ItemAt(index+col+fSize-1);
 			
 			tile->toprighttile = NULL;
 			tile->bottomrighttile = NULL;
 			tile->bottomtile = NULL;
 		}
 	}
-	uint16 arraysize = fSize * fSize;
-	for(uint16 i=0; i<arraysize; i++)
+	for (uint16 i = 0; i < arraysize; i++)
 	{
-		HexTile *tile = (HexTile*)fTiles.ItemAt(i);
-		if(tile->toplefttile)
+		HexTile *tile = fTiles.ItemAt(i);
+
+		if (tile->toplefttile)
 			tile->toplefttile->bottomrighttile = tile;
-		if(tile->bottomlefttile)
+		if (tile->bottomlefttile)
 			tile->bottomlefttile->toprighttile = tile;
-		if(tile->toptile)
+		if (tile->toptile)
 			tile->toptile->bottomtile = tile;
 	}
 }
@@ -116,7 +108,7 @@ HexGrid::HexGrid(uint8 size)
 HexGrid::~HexGrid(void)
 {
 	for(int32 i=0; i<fTiles.CountItems(); i++)
-		delete (HexTile*)fTiles.ItemAt(i);
+		delete fTiles.ItemAt(i);
 	fTiles.MakeEmpty();
 }
 
@@ -158,8 +150,8 @@ void HexGrid::GeneratePuzzle(void)
 	for(uint8 i=0; i<count; i++)
 	{
 		// swap two random elements
-		uint16 indexone = uint16(float(rand()) / RAND_MAX * arraysize);
-		uint16 indextwo = uint16(float(rand()) / RAND_MAX * arraysize);
+		uint16 indexone = RAND(0, arraysize);
+		uint16 indextwo = RAND(0, arraysize);
 
 		HexTile *itemone = fTiles.ItemAt(indexone);
 		HexTile *tempitem = fTiles.SwapWithItem(indextwo, itemone);
