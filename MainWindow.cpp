@@ -287,16 +287,20 @@ void MainWindow::MessageReceived(BMessage *msg)
 		{
 			HexTile *tile;
 			HexTileView *to;
-			msg->PrintToStream();
 			if(msg->FindPointer("to",(void**)&to)!=B_OK ||
-					msg->FindPointer("tile",(void**)&tile)!=B_OK)
+					msg->FindPointer("tile",(void**)&tile)!=B_OK) {
+				msg->SendReply(B_MESSAGE_NOT_UNDERSTOOD);
 				break;
-			tile->PrintToStream();
+			}
 
 			// If we're dropping to the storage grid
 			if(to->GridId() == fGrid->Id())
 			{
-				printf("To fGrid!\n");
+				if (!to->GetTile()->IsEmpty()) {
+					msg->SendReply(B_MESSAGE_NOT_UNDERSTOOD);
+					break;
+				}
+
 				*to->GetTile() = *tile;
 				tile->gridid = to->GridId();
 
@@ -306,7 +310,6 @@ void MainWindow::MessageReceived(BMessage *msg)
 			{
 				if(HexGrid::TryTile(tile, to->GetTile()))
 				{
-					printf("Tile fits!\n");
 					*to->GetTile() = *tile;
 					tile->gridid = to->GridId();
 					to->Invalidate();
@@ -317,13 +320,12 @@ void MainWindow::MessageReceived(BMessage *msg)
 						alert->Show();
 						GenerateGrid(fGridSize, true);
 					}
+				} else {
+					msg->SendReply(B_MESSAGE_NOT_UNDERSTOOD);
 				}
-				else
-					printf("Tile doesn't fit!\n");
 			}
 			else
 				debugger("Programmer Error: Orphaned Tile");
-
 			break;
 		}
 		default:

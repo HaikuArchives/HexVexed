@@ -13,6 +13,7 @@
 #include "HexTile.h"
 
 #define M_CHECK_DROP 'chdr'
+#define M_DROP_OK 'drok'
 
 #define TILESIZE_SMALL 50
 #define TILESIZE_MEDIUM 60
@@ -43,13 +44,18 @@ public:
 
 	static void CalcLayout(uint8 hextilesize);
 
+	bool FakeEmpty() { return fFakeEmpty; }
+
 private:
 
 	void DoDrag(void);
 
 	bool fMouseDown;
+	bool fFakeEmpty;
+
 	uint16 fGridId;
 	HexTile *fTile;
+	HexTile *fOtherTile;
 };
 
 void DrawHexTile(HexTileView *owner, BRect r, bool lockedIn);

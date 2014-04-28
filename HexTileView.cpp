@@ -99,6 +99,8 @@ HexTileView::HexTileView(const BPoint &pt, uint8 tilesize, const char *name, con
  	fMouseDown(false),
  	fTile(NULL)
 {
+	fOtherTile = new HexTile();
+	
 	if(tilesize!=TILESIZE_SMALL && tilesize!=TILESIZE_MEDIUM && tilesize!=TILESIZE_LARGE)
 		tilesize = TILESIZE_MEDIUM;
 
@@ -345,8 +347,6 @@ void HexTileView::MouseDown(BPoint pt)
 {
 	fMouseDown = true;
 
-	GetTile()->PrintToStream();
-
 	if(!fTile->IsEmpty())
 		DoDrag();
 }
@@ -362,16 +362,18 @@ void HexTileView::MouseUp(BPoint pt)
 
 void HexTileView::MessageReceived(BMessage *msg)
 {
+	msg->PrintToStream();
 	if(msg->WasDropped())
 	{
 		HexTile *tile = dynamic_cast<HexTile *>(HexTile::Instantiate(msg));
-		printf("Woo: %x\n", tile);
 
 		if(!tile)
 			return;
 
 		if(!fTile->IsEmpty())
 			return;
+
+		tile->PrintToStream();
 
 		// Well, we've gotten this far, so this tile must be empty and the other one not.
 		// Now we actually have to do some game logic. We can only do this from the
@@ -381,10 +383,23 @@ void HexTileView::MessageReceived(BMessage *msg)
 			BMessage post(M_CHECK_DROP);
 			post.AddPointer("tile", tile);
 			post.AddPointer("to", this);
-			post.PrintToStream();
-			Window()->PostMessage(&post);
-			printf("Check posted!\n");
+			Window()->PostMessage(&post, Window(), this);
 		}
+		return;
+	}
+
+	if(msg->what == B_MESSAGE_NOT_UNDERSTOOD) {
+		fOtherTile->PrintToStream();
+		fTile->PrintToStream();
+
+		printf("fOtherTile = %x, fOtherTile->IsEmpty = %s, fTile = %x", fOtherTile, fOtherTile->IsEmpty() ? "true" : "false", fTile);
+		
+		HexTile *tile = fOtherTile;
+		fOtherTile = fTile;
+		fTile = tile;
+		fTile->gridid = fGridId;
+		printf(", new fTile = %x, empty = %s\n", fTile, fTile->IsEmpty() ? "true" : "false");
+		Invalidate();
 		return;
 	}
 
@@ -393,6 +408,8 @@ void HexTileView::MessageReceived(BMessage *msg)
 
 void HexTileView::DoDrag(void)
 {
+	fFakeEmpty = true;
+	
 	BBitmap *bitmap = new BBitmap(Bounds(), B_RGBA32, true);
 	HexTileView *view = new HexTileView(BPoint(0,0), (uint8) Bounds().IntegerWidth(),NULL,0,0);
 	view->SetTile(GetTile());
@@ -411,20 +428,13 @@ void HexTileView::DoDrag(void)
 
 	BMessage msg(B_SIMPLE_DATA);
 
-	printf("Tile = %x\n", GetTile());
-
 	if(GetTile()->Archive(&msg) != B_OK)
 		debugger("Archiving failed!");
 
-	GetTile()->MakeEmpty();
+	*fOtherTile = *fTile;
+	fTile->MakeEmpty();
 	Invalidate();
 
-	thread_info info;
-	get_thread_info(find_thread(NULL), &info);
-	msg.AddInt32("teamid", info.team);
-
-	msg.PrintToStream();
-
 	DragMessage(&msg, bitmap, B_OP_OVER, 
-		BPoint(Bounds().Width() / 2, Bounds().Height() / 2));
+		BPoint(Bounds().Width() / 2, Bounds().Height() / 2), this);
 }
