@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2012 Scott McCreary
+ * Copyright 2014 Puck Meerburg
  * Based on BeVexed by DarkWyrm Copyright 2007-2009
  *
  * Distributed under terms of the MIT License.
@@ -28,10 +29,14 @@ public:
 	bool IsSolved(void);
 	
 	uint16 Id() { return fId; }
+	
+	uint16 NumberBase() { return fNumberBase; }
+	void SetNumberBase(uint16 nb) { fNumberBase = nb; }
 private:
 	BObjectList<HexTile> fTiles;
 	uint32 fSize;
 	uint16 fId;
+	uint16 fNumberBase;
 };
 
 #endif

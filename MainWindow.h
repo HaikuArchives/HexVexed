@@ -70,6 +70,7 @@ private:
 	BMenu *fBackMenu;
 	uint8 fGridSize;
 	uint8 fTileSize;
+	uint8 fNumberBase;
 	
 	BString fBackPath;
 	BString fBackName;

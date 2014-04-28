@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 Scott McCreary
+ * Copyright 2009-2014 Scott McCreary
  * Copyright 2013 Luke (noryb009)
  * Based on BeVexed by DarkWyrm Copyright 2007-2009
  *
@@ -137,12 +137,18 @@ rgb_color HexTileView::NumberColor(int num)
 	    case 2 :
 	    case 3 :
 	    case 6 :
-	    case 7 :  return white;
+	    case 7 :
+	    case 11 :
+	    case 13 :
+	    case 15 : return white;
 	              break;
 	    case 4 :
 	    case 5 :
 	    case 8 :
-	    case 9 :  return black;
+	    case 9 :
+	    case 10 :
+	    case 12 :
+	    case 14 : return black;
 	              break;
     }
     return black;
@@ -174,7 +180,13 @@ void DrawHexTile(HexTileView *owner, BRect r, bool lockedIn)
 	                            { 63,63,255,255 },      //Blue
 	                            { 124,33,176,255 },     //Purple
 	                            { 192,192,192,255 },    //Grey
-	                            { 255,255,255,255 } };  //White
+	                            { 255,255,255,255 },    //White 
+	                            { 255,153,153},         //
+	                            { 102,102,0},           //
+	                            { 0,204,255},           //
+	                            { 181,166,66},          //
+	                            { 234,234,174},         //
+	                            { 204,50,153} };        //
 
 	rgb_color numcolor;
 	BPoint 	point1, point2, point3, point4, point5, point6,
@@ -300,37 +312,229 @@ void DrawHexTile(HexTileView *owner, BRect r, bool lockedIn)
 	owner->SetDrawingMode(B_OP_ALPHA);
 
 	string = "";
-	string << (int)owner->GetTile()->topleft;
+	switch ((int)owner->GetTile()->topleft)
+		{
+			case 0 :
+			case 1 :
+			case 2 :
+			case 3 :
+			case 4 :
+			case 5 :
+			case 6 :
+			case 7 :
+			case 8 :
+			case 9 :
+				string << (int)owner->GetTile()->topleft;
+				break;
+			case 10:
+				string << "A";
+				break;
+			case 11:
+				string << "B";
+				break;
+			case 12:
+				string << "C";
+				break;
+			case 13:
+				string << "D";
+				break;
+			case 14:
+				string << "E";
+				break;
+			case 15:
+				string << "F";
+				break;
+		}
 	numcolor = owner->NumberColor((int)owner->GetTile()->topleft);
 	owner->SetHighColor(numcolor);
 	owner->DrawString(string.String(),sPoint1);
 
-	string = "";
-	string << (int)owner->GetTile()->top;
+	string="";
+	switch ((int)owner->GetTile()->top)
+		{
+			case 0 :
+			case 1 :
+			case 2 :
+			case 3 :
+			case 4 :
+			case 5 :
+			case 6 :
+			case 7 :
+			case 8 :
+			case 9 :
+				string << (int)owner->GetTile()->top;
+				break;
+			case 10:
+				string << "A";
+				break;
+			case 11:
+				string << "B";
+				break;
+			case 12:
+				string << "C";
+				break;
+			case 13:
+				string << "D";
+				break;
+			case 14:
+				string << "E";
+				break;
+			case 15:
+				string << "F";
+				break;
+		}
 	numcolor = owner->NumberColor((int)owner->GetTile()->top);
 	owner->SetHighColor(numcolor);
 	owner->DrawString(string.String(),sPoint2);
 
-	string = "";
-	string << (int)owner->GetTile()->topright;
+	string="";
+	switch ((int)owner->GetTile()->topright)
+		{
+			case 0 :
+			case 1 :
+			case 2 :
+			case 3 :
+			case 4 :
+			case 5 :
+			case 6 :
+			case 7 :
+			case 8 :
+			case 9 :
+				string << (int)owner->GetTile()->topright;
+				break;
+			case 10:
+				string << "A";
+				break;
+			case 11:
+				string << "B";
+				break;
+			case 12:
+				string << "C";
+				break;
+			case 13:
+				string << "D";
+				break;
+			case 14:
+				string << "E";
+				break;
+			case 15:
+				string << "F";
+				break;
+		}
 	numcolor = owner->NumberColor((int)owner->GetTile()->topright);
 	owner->SetHighColor(numcolor);
 	owner->DrawString(string.String(),sPoint3);
 
-	string = "";
-	string << (int)owner->GetTile()->bottomright;
+	string="";
+	switch ((int)owner->GetTile()->bottomright)
+		{
+			case 0 :
+			case 1 :
+			case 2 :
+			case 3 :
+			case 4 :
+			case 5 :
+			case 6 :
+			case 7 :
+			case 8 :
+			case 9 :
+				string << (int)owner->GetTile()->bottomright;
+				break;
+			case 10:
+				string << "A";
+				break;
+			case 11:
+				string << "B";
+				break;
+			case 12:
+				string << "C";
+				break;
+			case 13:
+				string << "D";
+				break;
+			case 14:
+				string << "E";
+				break;
+			case 15:
+				string << "F";
+				break;
+		}
 	numcolor = owner->NumberColor((int)owner->GetTile()->bottomright);
 	owner->SetHighColor(numcolor);
 	owner->DrawString(string.String(),sPoint4);
 
-	string = "";
-	string << (int)owner->GetTile()->bottom;
+	string="";
+	switch ((int)owner->GetTile()->bottom)
+		{
+			case 0 :
+			case 1 :
+			case 2 :
+			case 3 :
+			case 4 :
+			case 5 :
+			case 6 :
+			case 7 :
+			case 8 :
+			case 9 :
+				string << (int)owner->GetTile()->bottom;
+				break;
+			case 10:
+				string << "A";
+				break;
+			case 11:
+				string << "B";
+				break;
+			case 12:
+				string << "C";
+				break;
+			case 13:
+				string << "D";
+				break;
+			case 14:
+				string << "E";
+				break;
+			case 15:
+				string << "F";
+				break;
+		}
 	numcolor = owner->NumberColor((int)owner->GetTile()->bottom);
 	owner->SetHighColor(numcolor);
 	owner->DrawString(string.String(),sPoint5);
 
-	string = "";
-	string << (int)owner->GetTile()->bottomleft;
+	string="";
+	switch ((int)owner->GetTile()->bottomleft)
+		{
+			case 0 :
+			case 1 :
+			case 2 :
+			case 3 :
+			case 4 :
+			case 5 :
+			case 6 :
+			case 7 :
+			case 8 :
+			case 9 :
+				string << (int)owner->GetTile()->bottomleft;
+				break;
+			case 10:
+				string << "A";
+				break;
+			case 11:
+				string << "B";
+				break;
+			case 12:
+				string << "C";
+				break;
+			case 13:
+				string << "D";
+				break;
+			case 14:
+				string << "E";
+				break;
+			case 15:
+				string << "F";
+				break;
+		}
 	numcolor = owner->NumberColor((int)owner->GetTile()->bottomleft);
 	owner->SetHighColor(numcolor);
 	owner->DrawString(string.String(),sPoint6);

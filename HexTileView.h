@@ -20,6 +20,13 @@
 #define TILESIZE_LARGE 75
 #define TILESIZE_HUGE 100
 
+#define NUMBERBASE_BINARY		2
+#define NUMBERBASE_QUARTERNARY	4
+#define NUMBERBASE_HEXIMAL		6
+#define NUMBERBASE_OCTAL		8
+#define NUMBERBASE_DECIMAL		10
+#define NUMBERBASE_HEXADECIMAL	16
+
 class HexTileView : public BView
 {
 public:

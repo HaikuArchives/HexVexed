@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 Scott McCreary
+ * Copyright 2009-2014 Scott McCreary
  * Copyright 2013 Luke (noryb009)
  * Based on BeVexed by DarkWyrm Copyright 2007-2009
  *
@@ -40,7 +40,7 @@
 
 #define RAND(_min_, _max_) ({ uint8 low = _min_; uint8 high = _max_; rand() % (high-low) + low; })
 
-#define MKRAND RAND(0, 10)
+#define MKRAND RAND(0, fNumberBase)
 
 
 HexGrid::HexGrid(uint8 size, uint16 id)
@@ -116,6 +116,11 @@ HexGrid::~HexGrid(void)
 void HexGrid::GeneratePuzzle(void)
 {
 	HexTile *tile;
+	
+	if (fNumberBase > 16)
+		fNumberBase = 16;
+	if (fNumberBase < 1)
+		fNumberBase = 10;
 
 	// Generate tiles and index when solved
 	uint16 id = 0;
@@ -128,18 +133,18 @@ void HexGrid::GeneratePuzzle(void)
 			// if there is a tile above and its bottom has a value,
 			tile->top = (tile->toptile && tile->toptile->bottom != -1) ?
 				// get the bottom value. Otherwise, make a random value
-				tile->toptile->bottom : MKRAND;
+				tile->toptile->bottom : RAND(0, fNumberBase);
 			tile->topleft = (tile->toplefttile && tile->toplefttile->bottomright != -1) ?
-				tile->toplefttile->bottomright : MKRAND;
+				tile->toplefttile->bottomright : RAND(0, fNumberBase);
 			tile->topright = (tile->toprighttile && tile->toprighttile->bottomleft != -1) ?
-				tile->toprighttile->bottomleft : MKRAND;
+				tile->toprighttile->bottomleft : RAND(0, fNumberBase);
 			
 			tile->bottom = (tile->bottomtile && tile->bottomtile->top != -1) ?
-				tile->bottomtile->top : MKRAND;
+				tile->bottomtile->top : RAND(0, fNumberBase);
 			tile->bottomleft = (tile->bottomlefttile && tile->bottomlefttile->topright != -1) ?
-				tile->bottomlefttile->topright : MKRAND;
+				tile->bottomlefttile->topright : RAND(0, fNumberBase);
 			tile->bottomright = (tile->bottomrighttile && tile->bottomrighttile->topleft != -1) ?
-				tile->bottomrighttile->topleft : MKRAND;
+				tile->bottomrighttile->topleft : RAND(0, fNumberBase);
 			tile->id = id++;
 		}
 	}

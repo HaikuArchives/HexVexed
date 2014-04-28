@@ -43,6 +43,13 @@ enum
 	M_SET_TILE_COUNT_5,
 	M_SET_TILE_COUNT_6,
 	M_SET_TILE_COUNT_7,
+	
+	M_SET_BINARY,
+	M_SET_QUARTERNARY,
+	M_SET_HEXIMAL,
+	M_SET_OCTAL,
+	M_SET_DECIMAL,
+	M_SET_HEXADECIMAL,
 
 	M_HOW_TO_PLAY
 };
@@ -78,6 +85,12 @@ MainWindow::MainWindow(void)
 		Preferences::Message().AddInt8("tilesize",TILESIZE_MEDIUM);
 	}
 
+	if(Preferences::Message().FindInt8("numberbase",(int8*)&fTileSize)!=B_OK)
+	{
+		fNumberBase = NUMBERBASE_DECIMAL;
+		Preferences::Message().AddInt8("numberbase",NUMBERBASE_DECIMAL);
+	}
+
 	fBack = new BackView(Bounds(),"background",B_FOLLOW_ALL,B_WILL_DRAW | B_DRAW_ON_CHILDREN);
 	AddChild(fBack);
 	rgb_color randa = {rand() % 255, rand() % 255, rand() % 255, 255};
@@ -109,6 +122,16 @@ MainWindow::MainWindow(void)
 	submenu->AddItem(new BMenuItem("Medium",new BMessage(M_MEDIUM_TILES)));
 	submenu->AddItem(new BMenuItem("Large",new BMessage(M_LARGE_TILES)));
 	submenu->AddItem(new BMenuItem("Extra Large",new BMessage(M_HUGE_TILES)));
+	submenu->SetRadioMode(true);
+	menu->AddItem(submenu);
+	
+	submenu = new BMenu("Number Base");
+	submenu->AddItem(new BMenuItem("Binary",new BMessage(M_SET_BINARY)));
+	submenu->AddItem(new BMenuItem("Quarternary",new BMessage(M_SET_QUARTERNARY)));
+	submenu->AddItem(new BMenuItem("Heximal",new BMessage(M_SET_HEXIMAL)));
+	submenu->AddItem(new BMenuItem("Octal",new BMessage(M_SET_OCTAL)));
+	submenu->AddItem(new BMenuItem("Decimal",new BMessage(M_SET_DECIMAL)));
+	submenu->AddItem(new BMenuItem("Hexadecimal",new BMessage(M_SET_HEXADECIMAL)));
 	submenu->SetRadioMode(true);
 	menu->AddItem(submenu);
 
@@ -263,6 +286,48 @@ void MainWindow::MessageReceived(BMessage *msg)
 			GenerateGrid(fGridSize, true);
 			break;
 		}
+		case M_SET_BINARY:
+		{
+			fNumberBase = NUMBERBASE_BINARY;
+			Preferences::Message().ReplaceInt8("numberbase",NUMBERBASE_BINARY);
+			GenerateGrid(fGridSize, true);
+			break;
+		}
+		case M_SET_QUARTERNARY:
+		{
+			fNumberBase = NUMBERBASE_QUARTERNARY;
+			Preferences::Message().ReplaceInt8("numberbase",NUMBERBASE_QUARTERNARY);
+			GenerateGrid(fGridSize, true);
+			break;
+		}
+		case M_SET_HEXIMAL:
+		{
+			fNumberBase = NUMBERBASE_HEXIMAL;
+			Preferences::Message().ReplaceInt8("numberbase",NUMBERBASE_HEXIMAL);
+			GenerateGrid(fGridSize, true);
+			break;
+		}
+		case M_SET_OCTAL:
+		{
+			fNumberBase = NUMBERBASE_OCTAL;
+			Preferences::Message().ReplaceInt8("numberbase",NUMBERBASE_OCTAL);
+			GenerateGrid(fGridSize, true);
+			break;
+		}
+		case M_SET_DECIMAL:
+		{
+			fNumberBase = NUMBERBASE_DECIMAL;
+			Preferences::Message().ReplaceInt8("numberbase",NUMBERBASE_DECIMAL);
+			GenerateGrid(fGridSize, true);
+			break;
+		}
+		case M_SET_HEXADECIMAL:
+		{
+ 			fNumberBase = NUMBERBASE_HEXADECIMAL;
+ 			Preferences::Message().ReplaceInt8("numberbase",NUMBERBASE_HEXADECIMAL);
+			GenerateGrid(fGridSize, true);
+  			break;
+		}
 		case M_SET_BACKGROUND:
 		{
 			BString name;
@@ -359,6 +424,7 @@ void MainWindow::GenerateGrid(uint8 size, bool newGame)
 	if(newGame)
 	{
 		fGrid = new HexGrid(size, 0);
+		fGrid->SetNumberBase(fNumberBase);
 		fGrid->GeneratePuzzle();
 		fWorkGrid = new HexGrid(size, 1);
 	}
