@@ -36,30 +36,35 @@ void HexTileView::CalcLayout(uint8 tilesize)
 
 	switch(tilesize)
 	{
-		case TILESIZE_SMALL:
+		case TILESIZE_1:
 		{
 			sFontSize = 13;
 			break;
 		}
-		case TILESIZE_MEDIUM:
+		case TILESIZE_2:
 		{
 			sFontSize = 15;
 			break;
 		}
-		case TILESIZE_LARGE:
+		case TILESIZE_3:
 		{
 			sFontSize = 19;
 			break;
 		}
-		case TILESIZE_HUGE:
+		case TILESIZE_4:
 		{
 			sFontSize = 23;
 			break;
 		}
+		case TILESIZE_5:
+		{
+			sFontSize = 28;
+			break;
+		}
 		default:
 		{
-			tilesize = TILESIZE_MEDIUM;
-			sFontSize = 15;
+			tilesize = TILESIZE_3;
+			sFontSize = 19;
 		}
 	}
 
@@ -101,8 +106,8 @@ HexTileView::HexTileView(const BPoint &pt, uint8 tilesize, const char *name, con
 {
 	fOtherTile = new HexTile();
 	
-	if(tilesize!=TILESIZE_SMALL && tilesize!=TILESIZE_MEDIUM && tilesize!=TILESIZE_LARGE)
-		tilesize = TILESIZE_MEDIUM;
+	if((tilesize < TILESIZE_1) || (tilesize > TILESIZE_5))
+		tilesize = TILESIZE_3;
 
 	if(!sInit)
 		CalcLayout(tilesize);
@@ -181,12 +186,12 @@ void DrawHexTile(HexTileView *owner, BRect r, bool lockedIn)
 	                            { 124,33,176,255 },     //Purple
 	                            { 192,192,192,255 },    //Grey
 	                            { 255,255,255,255 },    //White 
-	                            { 255,153,153},         //
-	                            { 102,102,0},           //
-	                            { 0,204,255},           //
-	                            { 181,166,66},          //
-	                            { 234,234,174},         //
-	                            { 204,50,153} };        //
+	                            { 255,153,153,255 },    //
+	                            { 102,102,0,255 },      //
+	                            { 0,204,255,255 },      //
+	                            { 181,166,66,255 },     //
+	                            { 234,234,174,255 },    //
+	                            { 204,50,153,255 } };   //
 
 	rgb_color numcolor;
 	BPoint 	point1, point2, point3, point4, point5, point6,

@@ -31,10 +31,11 @@ enum
 {
 	M_NEW_GAME='nwgm',
 
-	M_SMALL_TILES,
-	M_MEDIUM_TILES,
-	M_LARGE_TILES,
-	M_HUGE_TILES,
+	M_SIZE1_TILES,
+	M_SIZE2_TILES,
+	M_SIZE3_TILES,
+	M_SIZE4_TILES,
+	M_SIZE5_TILES,
 
 	M_SET_BACKGROUND,
 
@@ -43,6 +44,7 @@ enum
 	M_SET_TILE_COUNT_5,
 	M_SET_TILE_COUNT_6,
 	M_SET_TILE_COUNT_7,
+	M_SET_TILE_COUNT_8,
 	
 	M_SET_BINARY,
 	M_SET_QUARTERNARY,
@@ -73,22 +75,15 @@ MainWindow::MainWindow(void)
 	Preferences::LockPreferences();
 	Preferences::Load();
 
-	if(Preferences::Message().FindInt8("gridsize",(int8*)&fGridSize)!=B_OK)
+//	if(Preferences::Message().FindInt8("gridsize",(int8*)&fGridSize)!=B_OK)
 	{
-		fGridSize = 3;
-		Preferences::Message().AddInt8("gridsize",3);
-	}
-
-	if(Preferences::Message().FindInt8("tilesize",(int8*)&fTileSize)!=B_OK)
-	{
-		fTileSize = TILESIZE_MEDIUM;
-		Preferences::Message().AddInt8("tilesize",TILESIZE_MEDIUM);
-	}
-
-	if(Preferences::Message().FindInt8("numberbase",(int8*)&fTileSize)!=B_OK)
-	{
-		fNumberBase = NUMBERBASE_DECIMAL;
-		Preferences::Message().AddInt8("numberbase",NUMBERBASE_DECIMAL);
+		// Preferences not working, so load these as the defaults
+		fGridSize = 6;
+		Preferences::Message().AddInt8("gridsize",6);
+		fTileSize = TILESIZE_3;
+		Preferences::Message().AddInt8("tilesize",TILESIZE_3);
+		fNumberBase = NUMBERBASE_HEXADECIMAL;
+		Preferences::Message().AddInt8("numberbase",NUMBERBASE_HEXADECIMAL);
 	}
 
 	fBack = new BackView(Bounds(),"background",B_FOLLOW_ALL,B_WILL_DRAW | B_DRAW_ON_CHILDREN);
@@ -118,10 +113,11 @@ MainWindow::MainWindow(void)
 	item->SetMarked(true);
 
 	submenu = new BMenu("Tile Size");
-	submenu->AddItem(new BMenuItem("Small",new BMessage(M_SMALL_TILES)));
-	submenu->AddItem(new BMenuItem("Medium",new BMessage(M_MEDIUM_TILES)));
-	submenu->AddItem(new BMenuItem("Large",new BMessage(M_LARGE_TILES)));
-	submenu->AddItem(new BMenuItem("Extra Large",new BMessage(M_HUGE_TILES)));
+	submenu->AddItem(new BMenuItem("Small",new BMessage(M_SIZE1_TILES)));
+	submenu->AddItem(new BMenuItem("Medium",new BMessage(M_SIZE2_TILES)));
+	submenu->AddItem(new BMenuItem("Large",new BMessage(M_SIZE3_TILES)));
+	submenu->AddItem(new BMenuItem("Extra Large",new BMessage(M_SIZE4_TILES)));
+	submenu->AddItem(new BMenuItem("Jumbo",new BMessage(M_SIZE5_TILES)));	
 	submenu->SetRadioMode(true);
 	menu->AddItem(submenu);
 	
@@ -141,26 +137,31 @@ MainWindow::MainWindow(void)
 
 	switch(fTileSize)
 	{
-		case TILESIZE_SMALL:
+		case TILESIZE_1:
 		{
 			submenu->ItemAt(0)->SetMarked(true);
 			break;
 		}
-		case TILESIZE_MEDIUM:
+		case TILESIZE_2:
 		{
 			submenu->ItemAt(1)->SetMarked(true);
 			break;
 		}
-		case TILESIZE_LARGE:
+		case TILESIZE_3:
 		{
 			submenu->ItemAt(2)->SetMarked(true);
 			break;
 		}
-		case TILESIZE_HUGE:
+		case TILESIZE_4:
 		{
 			submenu->ItemAt(3)->SetMarked(true);
 			break;
 		}
+		case TILESIZE_5:
+		{
+			submenu->ItemAt(4)->SetMarked(true);
+			break;
+		}		
 		default:
 		{
 			submenu->ItemAt(2)->SetMarked(true);
@@ -219,38 +220,46 @@ void MainWindow::MessageReceived(BMessage *msg)
 			GenerateGrid(fGridSize, true);
 			break;
 		}
-		case M_SMALL_TILES:
+		case M_SIZE1_TILES:
 		{
-			fTileSize = TILESIZE_SMALL;
-			Preferences::Message().ReplaceInt8("tilesize",TILESIZE_SMALL);
+			fTileSize = TILESIZE_1;
+			Preferences::Message().ReplaceInt8("tilesize",TILESIZE_1);
 			HexTileView::CalcLayout(fTileSize);
 			GenerateGrid(fGridSize, false);
 			break;
 		}
-		case M_MEDIUM_TILES:
+		case M_SIZE2_TILES:
 		{
-			fTileSize = TILESIZE_MEDIUM;
-			Preferences::Message().ReplaceInt8("tilesize",TILESIZE_MEDIUM);
+			fTileSize = TILESIZE_2;
+			Preferences::Message().ReplaceInt8("tilesize",TILESIZE_2);
 			HexTileView::CalcLayout(fTileSize);
 			GenerateGrid(fGridSize, false);
 			break;
 		}
-		case M_LARGE_TILES:
+		case M_SIZE3_TILES:
 		{
-			fTileSize = TILESIZE_LARGE;
-			Preferences::Message().ReplaceInt8("tilesize",TILESIZE_LARGE);
+			fTileSize = TILESIZE_3;
+			Preferences::Message().ReplaceInt8("tilesize",TILESIZE_3);
 			HexTileView::CalcLayout(fTileSize);
 			GenerateGrid(fGridSize, false);
 			break;
 		}
-		case M_HUGE_TILES:
+		case M_SIZE4_TILES:
 		{
-			fTileSize = TILESIZE_HUGE;
-			Preferences::Message().ReplaceInt8("tilesize",TILESIZE_LARGE);
+			fTileSize = TILESIZE_4;
+			Preferences::Message().ReplaceInt8("tilesize",TILESIZE_4);
 			HexTileView::CalcLayout(fTileSize);
 			GenerateGrid(fGridSize, false);
 			break;
 		}
+		case M_SIZE5_TILES:
+		{
+			fTileSize = TILESIZE_5;
+			Preferences::Message().ReplaceInt8("tilesize",TILESIZE_5);
+			HexTileView::CalcLayout(fTileSize);
+			GenerateGrid(fGridSize, false);
+			break;
+		}		
 		case M_SET_TILE_COUNT_3:
 		{
 			fGridSize = 3;

@@ -15,10 +15,11 @@
 #define M_CHECK_DROP 'chdr'
 #define M_DROP_OK 'drok'
 
-#define TILESIZE_SMALL 50
-#define TILESIZE_MEDIUM 60
-#define TILESIZE_LARGE 75
-#define TILESIZE_HUGE 100
+#define TILESIZE_1 50
+#define TILESIZE_2 60
+#define TILESIZE_3 75
+#define TILESIZE_4 100
+#define TILESIZE_5 125
 
 #define NUMBERBASE_BINARY		2
 #define NUMBERBASE_QUARTERNARY	4
