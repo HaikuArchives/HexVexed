@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 Scott McCreary
+ * Copyright 2009-2016 Scott McCreary
  * Copyright 2013 Luke (noryb009)
  * Based on BeVexed by DarkWyrm Copyright 2007-2009
  *
@@ -79,11 +79,11 @@ MainWindow::MainWindow(void)
 	{
 		// Preferences not working, so load these as the defaults
 		fGridSize = 6;
-		Preferences::Message().AddInt8("gridsize",6);
+		Preferences::Message().AddInt8("gridsize",fGridSize);
 		fTileSize = TILESIZE_3;
-		Preferences::Message().AddInt8("tilesize",TILESIZE_3);
+		Preferences::Message().AddInt8("tilesize",fTileSize);
 		fNumberBase = NUMBERBASE_HEXADECIMAL;
-		Preferences::Message().AddInt8("numberbase",NUMBERBASE_HEXADECIMAL);
+		Preferences::Message().AddInt8("numberbase", fNumberBase);
 	}
 
 	fBack = new BackView(Bounds(),"background",B_FOLLOW_ALL,B_WILL_DRAW | B_DRAW_ON_CHILDREN);
@@ -108,9 +108,6 @@ MainWindow::MainWindow(void)
 	submenu->SetRadioMode(true);
 	menu->AddSeparatorItem();
 	menu->AddItem(submenu);
-
-	BMenuItem *item = submenu->ItemAt(fGridSize - 3);
-	item->SetMarked(true);
 
 	submenu = new BMenu("Tile Size");
 	submenu->AddItem(new BMenuItem("Small",new BMessage(M_SIZE1_TILES)));
@@ -438,9 +435,6 @@ void MainWindow::GenerateGrid(uint8 size, bool newGame)
 		fWorkGrid = new HexGrid(size, 1);
 	}
 
-/*	ResizeTo( ((fTileSize+5) * size * 2) + (fTileSize * 0.5),
-			(  (fTileSize+5) * size ) + fMenuBar->Frame().Height() + (fTileSize * 0.5));
-*/
 	ResizeTo( ((fTileSize - 10) * (size - 1) + fTileSize) * 2 + offset1 + offset2 * 2,
 			(  fTileSize * size ) + fMenuBar->Frame().Height() + (fTileSize * 0.866) + 10);
 
