@@ -387,7 +387,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 
 					if(fWorkGrid->IsSolved())
 					{
-						ImageAlert *alert = new ImageAlert("HexVexedYouWin.jpg",'JPEG');
+						ImageAlert *alert = new ImageAlert("HexVexedYouWin.png",'PNG ');
 						alert->Show();
 						GenerateGrid(fGridSize, true);
 					}
