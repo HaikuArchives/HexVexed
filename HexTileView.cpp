@@ -574,13 +574,18 @@ void HexTileView::MessageReceived(BMessage *msg)
 	msg->PrintToStream();
 	if(msg->WasDropped())
 	{
+		printf("Dropped tile\n");
 		HexTile *tile = dynamic_cast<HexTile *>(HexTile::Instantiate(msg));
-
+		
 		if(!tile)
 			return;
 
 		if(!fTile->IsEmpty())
+		{
+			printf("    Not empty\n");
+			msg->SendReply(B_MESSAGE_NOT_UNDERSTOOD);
 			return;
+		}
 
 		tile->PrintToStream();
 
@@ -590,24 +595,25 @@ void HexTileView::MessageReceived(BMessage *msg)
 		if(Window())
 		{
 			BMessage post(M_CHECK_DROP);
+			post.AddMessage("original", msg);
 			post.AddPointer("tile", tile);
 			post.AddPointer("to", this);
+			printf("    Asking window to check drop\n");
 			Window()->PostMessage(&post, Window(), this);
 		}
 		return;
 	}
 
 	if(msg->what == B_MESSAGE_NOT_UNDERSTOOD) {
+		printf("Drop failed\n");
+		
 		fOtherTile->PrintToStream();
 		fTile->PrintToStream();
-
-		printf("fOtherTile = %x, fOtherTile->IsEmpty = %s, fTile = %x", fOtherTile, fOtherTile->IsEmpty() ? "true" : "false", fTile);
 		
 		HexTile *tile = fOtherTile;
 		fOtherTile = fTile;
 		fTile = tile;
 		fTile->gridid = fGridId;
-		printf(", new fTile = %x, empty = %s\n", fTile, fTile->IsEmpty() ? "true" : "false");
 		Invalidate();
 		return;
 	}

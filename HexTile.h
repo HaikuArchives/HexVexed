@@ -33,7 +33,7 @@ public:
 	bool IsEmpty(void) const { return (topleft<0 || top<0 || topright<0 || bottomleft<0 || bottom<0 || bottomright<0); }
 	void MakeEmpty(void) { topleft=top=topright=bottomleft=bottom=bottomright=-1; }
 	
-	void PrintToStream(void) { printf("Tile: id = %d, gridid = %d,\ntl = %d, t = %d, tr = %d,\nbl = %d, b = %d, br = %d\n",
+	void PrintToStream(void) { printf("<tile id = %d, gridid = %d, tl = %d, t = %d, tr = %d, bl = %d, b = %d, br = %d>\n",
 		id, gridid, topleft, top, topright, bottomleft, bottom, bottomright); 
 	} 
 	

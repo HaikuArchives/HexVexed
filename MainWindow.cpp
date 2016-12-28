@@ -358,8 +358,10 @@ void MainWindow::MessageReceived(BMessage *msg)
 		{
 			HexTile *tile;
 			HexTileView *to;
+			BMessage originalMsg;
 			if(msg->FindPointer("to",(void**)&to)!=B_OK ||
-					msg->FindPointer("tile",(void**)&tile)!=B_OK) {
+					msg->FindPointer("tile",(void**)&tile)!=B_OK ||
+					msg->FindMessage("original", &originalMsg)!=B_OK) {
 				msg->SendReply(B_MESSAGE_NOT_UNDERSTOOD);
 				break;
 			}
@@ -368,7 +370,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 			if(to->GridId() == fGrid->Id())
 			{
 				if (!to->GetTile()->IsEmpty()) {
-					msg->SendReply(B_MESSAGE_NOT_UNDERSTOOD);
+					originalMsg.SendReply(B_MESSAGE_NOT_UNDERSTOOD);
 					break;
 				}
 
@@ -392,7 +394,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 						GenerateGrid(fGridSize, true);
 					}
 				} else {
-					msg->SendReply(B_MESSAGE_NOT_UNDERSTOOD);
+					originalMsg.SendReply(B_MESSAGE_NOT_UNDERSTOOD);
 				}
 			}
 			else
