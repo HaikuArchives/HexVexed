@@ -74,9 +74,14 @@ MainWindow::MainWindow(void)
 	Preferences::Init();
 	Preferences::LockPreferences();
 	Preferences::Load();
+	
+	Preferences::Message().PrintToStream();
 
-//	if(Preferences::Message().FindInt8("gridsize",(int8*)&fGridSize)!=B_OK)
+	if(Preferences::Message().FindInt8("gridsize",(int8*)&fGridSize)!=B_OK
+		|| Preferences::Message().FindInt8("tilesize", (int8 *)&fTileSize)!=B_OK
+		|| Preferences::Message().FindInt8("numberbase", (int8 *)&fNumberBase)!=B_OK)
 	{
+		printf("Loading defaults\n");
 		// Preferences not working, so load these as the defaults
 		fGridSize = 6;
 		Preferences::Message().AddInt8("gridsize",fGridSize);
@@ -108,6 +113,25 @@ MainWindow::MainWindow(void)
 	submenu->SetRadioMode(true);
 	menu->AddSeparatorItem();
 	menu->AddItem(submenu);
+	
+	switch (fGridSize)
+	{
+		case 3:
+			submenu->ItemAt(0)->SetMarked(true);
+			break;
+		case 4:
+			submenu->ItemAt(1)->SetMarked(true);
+			break;
+		case 5:
+			submenu->ItemAt(2)->SetMarked(true);
+			break;
+		case 6:
+			submenu->ItemAt(3)->SetMarked(true);
+			break;
+		case 7:
+			submenu->ItemAt(4)->SetMarked(true);
+			break;
+	}
 
 	submenu = new BMenu("Tile Size");
 	submenu->AddItem(new BMenuItem("Small",new BMessage(M_SIZE1_TILES)));
@@ -117,6 +141,25 @@ MainWindow::MainWindow(void)
 	submenu->AddItem(new BMenuItem("Jumbo",new BMessage(M_SIZE5_TILES)));	
 	submenu->SetRadioMode(true);
 	menu->AddItem(submenu);
+	
+	switch (fTileSize)
+	{
+		case TILESIZE_1:
+			submenu->ItemAt(0)->SetMarked(true);
+			break;
+		case TILESIZE_2:
+			submenu->ItemAt(1)->SetMarked(true);
+			break;
+		case TILESIZE_3:
+			submenu->ItemAt(2)->SetMarked(true);
+			break;
+		case TILESIZE_4:
+			submenu->ItemAt(3)->SetMarked(true);
+			break;
+		case TILESIZE_5:
+			submenu->ItemAt(4)->SetMarked(true);
+			break;
+	}
 	
 	submenu = new BMenu("Number Base");
 	submenu->AddItem(new BMenuItem("Binary",new BMessage(M_SET_BINARY)));
@@ -128,43 +171,31 @@ MainWindow::MainWindow(void)
 	submenu->SetRadioMode(true);
 	menu->AddItem(submenu);
 
+	switch(fNumberBase)
+	{
+		case NUMBERBASE_BINARY:
+			submenu->ItemAt(0)->SetMarked(true);
+			break;
+		case NUMBERBASE_QUARTERNARY:
+			submenu->ItemAt(1)->SetMarked(true);
+			break;
+		case NUMBERBASE_HEXIMAL:
+			submenu->ItemAt(2)->SetMarked(true);
+			break;
+		case NUMBERBASE_OCTAL:
+			submenu->ItemAt(3)->SetMarked(true);
+			break;
+		case NUMBERBASE_DECIMAL:
+			submenu->ItemAt(4)->SetMarked(true);
+			break;
+		case NUMBERBASE_HEXADECIMAL:
+			submenu->ItemAt(5)->SetMarked(true);
+			break;
+	}
+
 	fBackMenu = new BMenu("Background");
 	menu->AddItem(fBackMenu);
 	ScanBackgrounds();
-
-	switch(fTileSize)
-	{
-		case TILESIZE_1:
-		{
-			submenu->ItemAt(0)->SetMarked(true);
-			break;
-		}
-		case TILESIZE_2:
-		{
-			submenu->ItemAt(1)->SetMarked(true);
-			break;
-		}
-		case TILESIZE_3:
-		{
-			submenu->ItemAt(2)->SetMarked(true);
-			break;
-		}
-		case TILESIZE_4:
-		{
-			submenu->ItemAt(3)->SetMarked(true);
-			break;
-		}
-		case TILESIZE_5:
-		{
-			submenu->ItemAt(4)->SetMarked(true);
-			break;
-		}		
-		default:
-		{
-			submenu->ItemAt(2)->SetMarked(true);
-			break;
-		}
-	}
 
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("How to Play…",new BMessage(M_HOW_TO_PLAY)));
