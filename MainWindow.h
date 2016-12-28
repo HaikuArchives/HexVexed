@@ -35,7 +35,8 @@ public:
 	void Draw(BRect rect) {
 		SetHighColor(fBackgroundColor);
 		FillRect(Bounds());
-		DrawBitmap(bitmap, bitmap->Bounds(), Bounds());
+		if (bitmap)
+			DrawBitmap(bitmap, bitmap->Bounds(), Bounds());
 		SetLowColor(fBackgroundColor);
 	}
 	
