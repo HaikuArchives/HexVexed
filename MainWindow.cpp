@@ -1,5 +1,6 @@
 /*
- * Copyright 2009-2016 Scott McCreary
+ * Copyright 2009-2017 Scott McCreary
+ * Copyright 2014-2016 Puck Meerburg
  * Copyright 2013 Luke (noryb009)
  * Based on BeVexed by DarkWyrm Copyright 2007-2009
  *
@@ -440,12 +441,11 @@ void MainWindow::MessageReceived(BMessage *msg)
 
 void MainWindow::GenerateGrid(uint8 size, bool newGame)
 {
-	const double factor1 = 0.75; //was 0.75 horizontal spacing
-	const double factor2 = 0.425;  //was 0.433 vertical spacing
-	//const double factor3 = 1.7;  //was 1.6
-	const double offset1 = 70; //was 70
-	const double offset2 = 20;  //was 20 
-	
+	const double factor1 = 0.75;
+	const double factor2 = 0.425;
+	const double offset1 = 70;
+	const double offset2 = 20;
+
 	if(fGrid && newGame)
 	{
 		delete fGrid;

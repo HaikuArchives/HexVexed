@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012 Scott McCreary
- * Copyright 2014 Puck Meerburg
+ * Copyright 2014-2016 Puck Meerburg
  * Based on BeVexed by DarkWyrm Copyright 2007-2009
  *
  * Distributed under terms of the MIT License.

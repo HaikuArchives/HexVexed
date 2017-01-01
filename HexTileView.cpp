@@ -1,5 +1,6 @@
 /*
- * Copyright 2009-2014 Scott McCreary
+ * Copyright 2009-2017 Scott McCreary
+ * Copyright 2014-2016 Puck Meerburg
  * Copyright 2013 Luke (noryb009)
  * Based on BeVexed by DarkWyrm Copyright 2007-2009
  *
@@ -38,7 +39,7 @@ void HexTileView::CalcLayout(uint8 tilesize)
 	{
 		case TILESIZE_1:
 		{
-			sFontSize = 13;
+			sFontSize = 11;
 			break;
 		}
 		case TILESIZE_2:
@@ -89,7 +90,7 @@ void HexTileView::CalcLayout(uint8 tilesize)
 	sPoint3.y = sPoint1.y;
 
 	sPoint4.x = sPoint3.x;
-	sPoint4.y = (tilesize / 3.0) * 2.0 + (sFontHeight / 2.0) - 1;
+	sPoint4.y = (tilesize / 3.0) * 2.0 + (sFontHeight / 2.0) - 3;
 
 	sPoint5.x = sPoint2.x;
 	sPoint5.y = sPoint4.y + (tilesize / 8.0);
@@ -278,7 +279,6 @@ void DrawHexTile(HexTileView *owner, BRect r, bool lockedIn)
 
 	// dividers
 
-	// r.InsetBy(10,10);
 	owner->SetHighColor(shadow);
 	owner->SetPenSize(3.0);
 	owner->StrokeLine(point1, point4);
@@ -302,15 +302,7 @@ void DrawHexTile(HexTileView *owner, BRect r, bool lockedIn)
 	BRect bevel(r);
 	bevel.InsetBy(1,1);
 	owner->SetHighColor(255,255,255);
-/*
-	owner->StrokeLine(bevel.point1,bevel.point2);
-	owner->StrokeLine(bevel.point2,bevel.point3);
-	owner->StrokeLine(bevel.point3,bevel.point4);
-	owner->SetHighColor(0,0,0);
-	owner->StrokeLine(bevel.point4,bevel.point5);
-	owner->StrokeLine(bevel.point5,bevel.point6);
-	owner->StrokeLine(bevel.point6,bevel.point1);
-*/
+
 	// Numbers
 	BString string;
 
