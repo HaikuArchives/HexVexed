@@ -57,6 +57,9 @@ enum
 	M_HOW_TO_PLAY
 };
 
+static const float cos30 = 0.866;
+
+
 MainWindow::MainWindow(void)
  :	BWindow(BRect(100,100,500,400),"HexVexed",B_TITLED_WINDOW_LOOK,
  	B_NORMAL_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE),
@@ -439,13 +442,32 @@ void MainWindow::MessageReceived(BMessage *msg)
 	Preferences::UnlockPreferences();
 }
 
+
+float
+MainWindow::GenerateTiles(uint8 size, const BPoint& point, HexGrid* grid)
+{
+	float x = point.x;
+	for (uint8 col = 0; col < size; col++, x += fTileSize * cos30) {
+		float y = point.y;
+		if (col % 2)
+			y += fTileSize * 0.5;
+
+		for (uint8 row = 0; row < size; row++, y += fTileSize) {
+			HexTileView* tile = new HexTileView(BPoint(x, y), fTileSize, "tile",
+				B_FOLLOW_NONE, B_WILL_DRAW);
+			tile->SetGridId(grid->Id());
+			fBack->AddChild(tile);
+			tile->Invalidate(tile->Bounds());
+			tile->SetTile(grid->TileAt(row * size + col));
+		}
+	}
+
+	return x;
+}
+
+
 void MainWindow::GenerateGrid(uint8 size, bool newGame)
 {
-	const double factor1 = 0.75;
-	const double factor2 = 0.425;
-	const double offset1 = 70;
-	const double offset2 = 20;
-
 	if(fGrid && newGame)
 	{
 		delete fGrid;
@@ -468,64 +490,15 @@ void MainWindow::GenerateGrid(uint8 size, bool newGame)
 		fWorkGrid = new HexGrid(size, 1);
 	}
 
-	ResizeTo( ((fTileSize - 10) * (size - 1) + fTileSize) * 2 + offset1 + offset2 * 2,
-			(  fTileSize * size ) + fMenuBar->Frame().Height() + (fTileSize * 0.866) + 10);
+	const float inset = 10;
+	const float w = fTileSize * cos30 * (size * 2 + 1);
+	const float h = fTileSize * (size + 0.5);
+	const BPoint leftTop(inset, fMenuBar->Frame().bottom + inset);
 
-	BRect r(10,
-			fMenuBar->Frame().bottom + 10,
-			10 + fTileSize,
-			10 + fMenuBar->Frame().bottom + fTileSize);
+	ResizeTo(leftTop.x + w + inset, leftTop.y + h + inset);
 
-	for(uint8 row=0; row<size; row++)
-	{
-		for(uint8 col=0; col<size; col++)
-		{
-			HexTileView *tile = new HexTileView(r.LeftTop(),fTileSize,"tile",
-											B_FOLLOW_NONE,B_WILL_DRAW);
-			tile->SetGridId(fWorkGrid->Id());
-			fBack->AddChild(tile);
-			tile->Invalidate(tile->Bounds());
-
-		    if ( (col % 2) == 1 ) { 
-		    	r.OffsetBy(((fTileSize * factor1) + fTileSize * 0.1), -(fTileSize * factor2 + fTileSize * 0.125) +1); //was 0.1
-		    	tile->SetTile(fWorkGrid->TileAt((size * row) + col));
-	    		r.OffsetBy(0, 0);
-			} else {
-		    	r.OffsetBy(((fTileSize * factor1) + fTileSize * 0.1), fTileSize * factor2 + fTileSize * 0.125); //was 0.1
-		    	tile->SetTile(fWorkGrid->TileAt((size * row) + col));
-		    	r.OffsetBy(0, 0);
-				}
-		}
-
-		if ( (size % 2) == 1 ) 
-			r.OffsetBy(fTileSize, fTileSize * -0.5);
-		else
-			r.OffsetBy(fTileSize, 0);
-			
-		for(uint8 col=0; col<size; col++)
-		{
-			HexTileView *tile = new HexTileView(r.LeftTop(),fTileSize,"tile",
-											B_FOLLOW_NONE,B_WILL_DRAW);
-			tile->SetGridId(fGrid->Id());
-			fBack->AddChild(tile);
-			tile->Invalidate(tile->Bounds());
-			
-		    if ( (col % 2) == 1 ) { 
-				r.OffsetBy(((fTileSize * factor1) + fTileSize * 0.1), fTileSize * -factor2 - fTileSize * 0.1);
-				tile->SetTile(fGrid->TileAt((size * row) + col));
-	 		   	r.OffsetBy(0, 0);
-		    } else {
-		    	r.OffsetBy(((fTileSize * factor1) + fTileSize * 0.1), fTileSize * factor2 + fTileSize * 0.1);
-		    	tile->SetTile(fGrid->TileAt((size * row) + col));
-		    	r.OffsetBy(0, 0);
-				}
-		}
-
-		if ( (size % 2) == 1 ) 
-			r.OffsetBy(-(r.left - 10), factor2 * fTileSize);
-		else
-			r.OffsetBy(-(r.left - 10), fTileSize);
-	}
+	const float x = GenerateTiles(size, leftTop, fWorkGrid);
+	GenerateTiles(size, BPoint(x + fTileSize * 0.75, leftTop.y), fGrid);
 
 	fBack->Invalidate();
 }
