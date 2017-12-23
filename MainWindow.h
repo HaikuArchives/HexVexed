@@ -61,7 +61,7 @@ public:
 	bool	QuitRequested(void);
 	void	MessageReceived(BMessage *msg);
 private:
-	float	GenerateTiles(uint8 size, const BPoint& point, HexGrid* grid);
+	float	GenerateTiles(const BPoint& point, HexGrid* grid);
 	void	GenerateGrid(uint8 size, bool newGame);
 	void	ScanBackgrounds(void);
 	void	SetBackground(const char *name);
