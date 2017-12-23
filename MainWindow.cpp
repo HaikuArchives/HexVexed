@@ -444,21 +444,21 @@ void MainWindow::MessageReceived(BMessage *msg)
 
 
 float
-MainWindow::GenerateTiles(uint8 size, const BPoint& point, HexGrid* grid)
+MainWindow::GenerateTiles(const BPoint& point, HexGrid* grid)
 {
 	float x = point.x;
-	for (uint8 col = 0; col < size; col++, x += fTileSize * cos30) {
+	for (uint8 col = 0; col < fGridSize; col++, x += fTileSize * cos30) {
 		float y = point.y;
 		if (col % 2)
 			y += fTileSize * 0.5;
 
-		for (uint8 row = 0; row < size; row++, y += fTileSize) {
+		for (uint8 row = 0; row < fGridSize; row++, y += fTileSize) {
 			HexTileView* tile = new HexTileView(BPoint(x, y), fTileSize, "tile",
 				B_FOLLOW_NONE, B_WILL_DRAW);
 			tile->SetGridId(grid->Id());
 			fBack->AddChild(tile);
 			tile->Invalidate(tile->Bounds());
-			tile->SetTile(grid->TileAt(row * size + col));
+			tile->SetTile(grid->TileAt(row * fGridSize + col));
 		}
 	}
 
@@ -497,8 +497,8 @@ void MainWindow::GenerateGrid(uint8 size, bool newGame)
 
 	ResizeTo(leftTop.x + w + inset, leftTop.y + h + inset);
 
-	const float x = GenerateTiles(size, leftTop, fWorkGrid);
-	GenerateTiles(size, BPoint(x + fTileSize * 0.75, leftTop.y), fGrid);
+	const float x = GenerateTiles(leftTop, fWorkGrid);
+	GenerateTiles(BPoint(x + fTileSize * 0.75, leftTop.y), fGrid);
 
 	fBack->Invalidate();
 }
