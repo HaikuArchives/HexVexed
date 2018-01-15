@@ -21,6 +21,7 @@
 #include <Path.h>
 #include <Entry.h>
 #include <Directory.h>
+#include <Box.h>
 #include "AboutWindow.h"
 #include "Preferences.h"
 #include "HexTile.h"
@@ -205,6 +206,23 @@ MainWindow::MainWindow(void)
 	menu->AddItem(new BMenuItem("How to Play…",new BMessage(M_HOW_TO_PLAY)));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("About HexVexed…",new BMessage(B_ABOUT_REQUESTED)));
+
+	BBox *timeBox = new BBox("box");
+	timeBox->ResizeTo(70, 34);
+	timeBox->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fBack->AddChild(timeBox);
+
+	fTimer = new TimerView();
+	fTimer->ResizeTo(70, 30);
+
+	BFont font = be_bold_font;
+	font.SetSize(20);
+	fTimer->SetFontAndColor(&font);
+
+	fTimer->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fTimer->SetAlignment(B_ALIGN_CENTER);
+	timeBox->AddChild(fTimer);
+
 	GenerateGrid(fGridSize, true);
 
 	BPoint corner;
@@ -391,6 +409,9 @@ void MainWindow::MessageReceived(BMessage *msg)
 		}
 		case M_CHECK_DROP:
 		{
+			if (!fTimer->Running())
+				fTimer->Start();
+
 			HexTile *tile;
 			HexTileView *to;
 			BMessage originalMsg;
@@ -424,6 +445,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 
 					if(fWorkGrid->IsSolved())
 					{
+						fTimer->Stop();
 						ImageAlert *alert = new ImageAlert("HexVexedYouWin.png",'PNG ');
 						alert->Show();
 						GenerateGrid(fGridSize, true);
@@ -468,20 +490,30 @@ MainWindow::GenerateTiles(const BPoint& point, HexGrid* grid)
 
 void MainWindow::GenerateGrid(uint8 size, bool newGame)
 {
+	if (newGame && fTimer->Running()) {
+		BAlert* alert = new BAlert("",
+			"Are you sure you want to abort the current game?", "No", "Yes");
+		alert->SetShortcut(0, B_ESCAPE);
+
+		if (alert->Go() == 0)
+			return;
+
+		fTimer->Stop();
+	}
+
 	if(fGrid && newGame)
 	{
 		delete fGrid;
 		delete fWorkGrid;
 	}
 
-	fBack->RemoveChild(fMenuBar);
-	while(fBack->CountChildren()>0)
+	while(fBack->CountChildren() > 2)
 	{
-		BView *child = fBack->ChildAt(0);
+		BView *child = fBack->ChildAt(2);
 		child->RemoveSelf();
 		delete child;
 	}
-	fBack->AddChild(fMenuBar);
+
 	if(newGame)
 	{
 		fGrid = new HexGrid(size, 0);
@@ -493,13 +525,20 @@ void MainWindow::GenerateGrid(uint8 size, bool newGame)
 	const float inset = 10;
 	const float w = fTileSize * cos30 * (size * 2 + 1);
 	const float h = fTileSize * (size + 0.5);
+
+	const BRect timerBox(FindView("box")->Bounds());
 	const BPoint leftTop(inset, fMenuBar->Frame().bottom + inset);
 
-	ResizeTo(leftTop.x + w + inset, leftTop.y + h + inset);
+	const float timerY = leftTop.y + h + inset;
+	const float windowWidth = leftTop.x + w + inset;
+	const float windowHeight = timerY + timerBox.Height() + inset;
+
+	ResizeTo(windowWidth, windowHeight);
 
 	const float x = GenerateTiles(leftTop, fWorkGrid);
 	GenerateTiles(BPoint(x + fTileSize * 0.75, leftTop.y), fGrid);
 
+	fBack->ChildAt(1)->MoveTo((windowWidth - timerBox.Width()) / 2, timerY);
 	fBack->Invalidate();
 }
 

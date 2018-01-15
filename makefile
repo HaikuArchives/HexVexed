@@ -37,7 +37,7 @@ APP_MIME_SIG=
 SRCS= AboutWindow.cpp App.cpp \
 	HexGrid.cpp HexTile.cpp \
 	HexTileView.cpp ImageAlert.cpp \
-	MainWindow.cpp Preferences.cpp
+	MainWindow.cpp Preferences.cpp TimerView.cpp
 
 #	specify the resource definition files to use
 #	full path or a relative path to the resource file can be used.

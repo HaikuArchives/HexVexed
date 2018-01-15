@@ -19,6 +19,8 @@
 #include <stdlib.h>
 #include <TranslationUtils.h>
 
+#include "TimerView.h"
+
 class HexGrid;
 
 class BackView : public BView
@@ -70,6 +72,7 @@ private:
 	BackView *fBack;
 	BMenuBar *fMenuBar;
 	BMenu *fBackMenu;
+	TimerView *fTimer;
 	uint8 fGridSize;
 	uint8 fTileSize;
 	uint8 fNumberBase;
