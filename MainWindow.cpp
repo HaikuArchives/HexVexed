@@ -60,6 +60,9 @@ enum
 
 static const float cos30 = 0.866;
 
+static const uint8 tileSizes[] = {
+	TILESIZE_1, TILESIZE_2, TILESIZE_3, TILESIZE_4, TILESIZE_5
+};
 
 MainWindow::MainWindow(void)
  :	BWindow(BRect(100,100,500,400),"HexVexed",B_TITLED_WINDOW_LOOK,
@@ -147,24 +150,11 @@ MainWindow::MainWindow(void)
 	submenu->SetRadioMode(true);
 	menu->AddItem(submenu);
 	
-	switch (fTileSize)
-	{
-		case TILESIZE_1:
-			submenu->ItemAt(0)->SetMarked(true);
+	for (int32 index = 0; index < 5; index++)
+		if (fTileSize == tileSizes[index]) {
+			submenu->ItemAt(index)->SetMarked(true);
 			break;
-		case TILESIZE_2:
-			submenu->ItemAt(1)->SetMarked(true);
-			break;
-		case TILESIZE_3:
-			submenu->ItemAt(2)->SetMarked(true);
-			break;
-		case TILESIZE_4:
-			submenu->ItemAt(3)->SetMarked(true);
-			break;
-		case TILESIZE_5:
-			submenu->ItemAt(4)->SetMarked(true);
-			break;
-	}
+		}
 	
 	submenu = new BMenu("Number Base");
 	submenu->AddItem(new BMenuItem("Binary",new BMessage(M_SET_BINARY)));
@@ -271,45 +261,20 @@ void MainWindow::MessageReceived(BMessage *msg)
 			break;
 		}
 		case M_SIZE1_TILES:
-		{
-			fTileSize = TILESIZE_1;
-			Preferences::Message().ReplaceInt8("tilesize",TILESIZE_1);
-			HexTileView::CalcLayout(fTileSize);
-			GenerateGrid(fGridSize, false);
-			break;
-		}
 		case M_SIZE2_TILES:
-		{
-			fTileSize = TILESIZE_2;
-			Preferences::Message().ReplaceInt8("tilesize",TILESIZE_2);
-			HexTileView::CalcLayout(fTileSize);
-			GenerateGrid(fGridSize, false);
-			break;
-		}
 		case M_SIZE3_TILES:
-		{
-			fTileSize = TILESIZE_3;
-			Preferences::Message().ReplaceInt8("tilesize",TILESIZE_3);
-			HexTileView::CalcLayout(fTileSize);
-			GenerateGrid(fGridSize, false);
-			break;
-		}
 		case M_SIZE4_TILES:
-		{
-			fTileSize = TILESIZE_4;
-			Preferences::Message().ReplaceInt8("tilesize",TILESIZE_4);
-			HexTileView::CalcLayout(fTileSize);
-			GenerateGrid(fGridSize, false);
-			break;
-		}
 		case M_SIZE5_TILES:
 		{
-			fTileSize = TILESIZE_5;
-			Preferences::Message().ReplaceInt8("tilesize",TILESIZE_5);
-			HexTileView::CalcLayout(fTileSize);
-			GenerateGrid(fGridSize, false);
+			const uint8 tileSize = tileSizes[msg->what - M_SIZE1_TILES];
+			if (fTileSize != tileSize) {
+				fTileSize = tileSize;
+				Preferences::Message().ReplaceInt8("tilesize", fTileSize);
+				HexTileView::CalcLayout(fTileSize);
+				GenerateGrid(fGridSize, false);
+			}
 			break;
-		}		
+		}
 		case M_SET_TILE_COUNT_3:
 		{
 			fGridSize = 3;
@@ -409,9 +374,6 @@ void MainWindow::MessageReceived(BMessage *msg)
 		}
 		case M_CHECK_DROP:
 		{
-			if (!fTimer->Running())
-				fTimer->Start();
-
 			HexTile *tile;
 			HexTileView *to;
 			BMessage originalMsg;
@@ -490,36 +452,34 @@ MainWindow::GenerateTiles(const BPoint& point, HexGrid* grid)
 
 void MainWindow::GenerateGrid(uint8 size, bool newGame)
 {
-	if (newGame && fTimer->Running()) {
-		BAlert* alert = new BAlert("",
-			"Are you sure you want to abort the current game?", "No", "Yes");
-		alert->SetShortcut(0, B_ESCAPE);
+	if (newGame) {
+		if (fTimer->Running()) {
+			BAlert* alert = new BAlert("",
+				"Do you want to abort the current game?", "No", "Yes");
+			alert->SetShortcut(0, B_ESCAPE);
 
-		if (alert->Go() == 0)
-			return;
+			if (alert->Go() == 0)
+				return;
 
-		fTimer->Stop();
-	}
+			fTimer->Stop();
+		}
 
-	if(fGrid && newGame)
-	{
 		delete fGrid;
 		delete fWorkGrid;
-	}
 
-	while(fBack->CountChildren() > 2)
-	{
-		BView *child = fBack->ChildAt(2);
-		child->RemoveSelf();
-		delete child;
-	}
-
-	if(newGame)
-	{
 		fGrid = new HexGrid(size, 0);
 		fGrid->SetNumberBase(fNumberBase);
 		fGrid->GeneratePuzzle();
+
 		fWorkGrid = new HexGrid(size, 1);
+
+		fTimer->Start();
+	}
+
+	while (fBack->CountChildren() > 2) {
+		BView *child = fBack->ChildAt(2);
+		child->RemoveSelf();
+		delete child;
 	}
 
 	const float inset = 10;
