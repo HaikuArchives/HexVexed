@@ -410,7 +410,6 @@ void MainWindow::MessageReceived(BMessage *msg)
 						fTimer->Stop();
 						ImageAlert *alert = new ImageAlert("HexVexedYouWin.png",'PNG ');
 						alert->Show();
-						GenerateGrid(fGridSize, true);
 					}
 				} else {
 					originalMsg.SendReply(B_MESSAGE_NOT_UNDERSTOOD);
