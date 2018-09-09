@@ -91,7 +91,7 @@ MainWindow::MainWindow(void)
 	{
 		printf("Loading defaults\n");
 		// Preferences not working, so load these as the defaults
-		fGridSize = 6;
+		fGridSize = 3;
 		Preferences::Message().AddInt8("gridsize",fGridSize);
 		fTileSize = TILESIZE_3;
 		Preferences::Message().AddInt8("tilesize",fTileSize);
