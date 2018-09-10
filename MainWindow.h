@@ -10,6 +10,9 @@
 
 #include <Application.h>
 #include <Bitmap.h>
+#include <Entry.h>
+#include <Path.h>
+#include <Roster.h>
 #include <Screen.h>
 #include <Window.h>
 #include <MenuBar.h>
@@ -29,7 +32,13 @@ public:
 	BackView(BRect r, const char* t, uint32 fl, uint32 fl2)
 	: BView(r, t, fl, fl2) {
 		fBackgroundColor = BScreen().DesktopColor();
-		bitmap = BTranslationUtils::GetBitmap("/boot/home/hexvexed/background.png");
+		app_info info;
+		be_roster->GetActiveAppInfo(&info);
+		BEntry entry(&info.ref);
+		BPath path;
+		entry.GetPath(&path);
+		path.Append("backgrounds/background.png");
+		bitmap = BTranslationUtils::GetBitmap(path.Path());
 		}
 	
 	
