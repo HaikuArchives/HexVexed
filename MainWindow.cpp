@@ -1,4 +1,6 @@
 /*
+ * Copyright 2018 Humdinger
+ * Copyright 2017-2018 Owen
  * Copyright 2009-2017 Scott McCreary
  * Copyright 2014-2016 Puck Meerburg
  * Copyright 2013 Luke (noryb009)
@@ -18,7 +20,9 @@
 #include <Bitmap.h>
 #include <TranslationUtils.h>
 #include <Roster.h>
+#include <StringList.h>
 #include <Path.h>
+#include <PathFinder.h>
 #include <Entry.h>
 #include <Directory.h>
 #include <Box.h>
@@ -70,15 +74,18 @@ MainWindow::MainWindow(void)
  	fGrid(NULL),
  	fWorkGrid(NULL)
 {
-	app_info ai;
-	be_app->GetAppInfo(&ai);
-	BPath path(&ai.ref);
-	path.GetParent(&path);
-	path.Append("backgrounds");
-	fBackPath = path.Path();
+	BPath path;
+	BPathFinder pathFinder;
+	BStringList paths;
+
+	status_t error = pathFinder.FindPaths(B_FIND_PATH_DATA_DIRECTORY,
+	"hexvexed/backgrounds", paths);
+
+	if (error == B_OK && path.SetTo(paths.StringAt(0)) == B_OK)
+		fBackPath = path.Path();
+
 	fBackPath << "/";
 
-	static const rgb_color beos_blue = {51,102,152,255};
 	Preferences::Init();
 	Preferences::LockPreferences();
 	Preferences::Load();
@@ -99,10 +106,8 @@ MainWindow::MainWindow(void)
 		Preferences::Message().AddInt8("numberbase", fNumberBase);
 	}
 
-	fBack = new BackView(Bounds(),"background",B_FOLLOW_ALL,B_WILL_DRAW | B_DRAW_ON_CHILDREN);
+	fBack = new BView(Bounds(),"background",B_FOLLOW_ALL,B_WILL_DRAW | B_DRAW_ON_CHILDREN);
 	AddChild(fBack);
-	rgb_color randa = {rand() % 255, rand() % 255, rand() % 255, 255};
-	fBack->SetViewColor(B_TRANSPARENT_COLOR);
 
 	fMenuBar = new BMenuBar(BRect(0,0,Bounds().Width(),20),"menubar");
 	fBack->AddChild(fMenuBar);
@@ -229,6 +234,8 @@ MainWindow::MainWindow(void)
 
 	if(Preferences::Message().FindString("background",&fBackName) == B_OK)
 		SetBackground(fBackName.String());
+	else
+		SetBackground("Grass.png"); //default
 
 	Preferences::UnlockPreferences();
 }
@@ -511,8 +518,6 @@ void MainWindow::ScanBackgrounds(void)
 
 	BMessage *msg = new BMessage(M_SET_BACKGROUND);
 	msg->AddString("name","");
-	fBackMenu->AddItem(new BMenuItem("None",msg));
-	fBackMenu->AddSeparatorItem();
 
 	BDirectory dir(fBackPath.String());
 	dir.Rewind();

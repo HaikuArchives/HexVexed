@@ -26,45 +26,6 @@
 
 class HexGrid;
 
-class BackView : public BView
-{
-public:
-	BackView(BRect r, const char* t, uint32 fl, uint32 fl2)
-	: BView(r, t, fl, fl2) {
-		fBackgroundColor = BScreen().DesktopColor();
-		app_info info;
-		be_roster->GetActiveAppInfo(&info);
-		BEntry entry(&info.ref);
-		BPath path;
-		entry.GetPath(&path);
-		path.Append("backgrounds/background.png");
-		bitmap = BTranslationUtils::GetBitmap(path.Path());
-		}
-	
-	
-	
-	void Draw(BRect rect) {
-		SetHighColor(fBackgroundColor);
-		FillRect(Bounds());
-		if (bitmap)
-			DrawBitmap(bitmap, bitmap->Bounds(), Bounds());
-		SetLowColor(fBackgroundColor);
-	}
-	
-	void	SetBackgroundColor(rgb_color color) {
-		fBackgroundColor = color;
-		Invalidate();
-	}
-
-	rgb_color BackgroundColor() {
-		return fBackgroundColor;
-	}
-
-private:
-	rgb_color fBackgroundColor;
-	BBitmap *bitmap;
-};
-
 class MainWindow : public BWindow
 {
 public:
@@ -78,7 +39,7 @@ private:
 	void	SetBackground(const char *name);
 	
 	HexGrid *fGrid, *fWorkGrid;
-	BackView *fBack;
+	BView *fBack;
 	BMenuBar *fMenuBar;
 	BMenu *fBackMenu;
 	TimerView *fTimer;
