@@ -79,18 +79,19 @@ MainWindow::MainWindow(void)
 	BStringList paths;
 
 	status_t error = pathFinder.FindPaths(B_FIND_PATH_DATA_DIRECTORY,
-	"hexvexed/backgrounds", paths);
+	"hexvexed/backgrounds", B_FIND_PATH_EXISTING_ONLY, paths);
 
-	if (error == B_OK && path.SetTo(paths.StringAt(0)) == B_OK)
-		fBackPath = path.Path();
+	for (int i = 0; i < paths.CountStrings(); ++i) {
+		// grab 1st path, to have non-packaged override the bundled backgrounds
+		if (error == B_OK && path.SetTo(paths.StringAt(0)) == B_OK)
+			fBackPath = path.Path();
+	}
 
 	fBackPath << "/";
 
 	Preferences::Init();
 	Preferences::LockPreferences();
 	Preferences::Load();
-	
-	Preferences::Message().PrintToStream();
 
 	if(Preferences::Message().FindInt8("gridsize",(int8*)&fGridSize)!=B_OK
 		|| Preferences::Message().FindInt8("tilesize", (int8 *)&fTileSize)!=B_OK
