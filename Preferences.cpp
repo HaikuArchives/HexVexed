@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <Directory.h>
+#include <FindDirectory.h>
 #include <PathFinder.h>
 #include <string>
 #include <stdio.h>
@@ -65,13 +67,16 @@ void ConstrainWindowFrameToScreen(BRect *rect)
 void
 Preferences::Init()
 {
-	BPathFinder finder;
-	if (finder.FindPath(B_FIND_PATH_SETTINGS_DIRECTORY, "HexVexed",
-		B_FIND_PATH_CREATE_PARENT_DIRECTORY, fPrefsPath) != B_OK) {
-		find_directory(B_USER_SETTINGS_DIRECTORY, &fPrefsPath);
-		fPrefsPath.Append("global/HexVexed");
+	if (status_t status = find_directory(B_USER_SETTINGS_DIRECTORY,
+			&fPrefsPath) == B_OK) {
+		status = fPrefsPath.Append("HexVexed");
+
+		if (status == B_OK)
+			status = create_directory(fPrefsPath.Path(), 0777);
+
+		if (status == B_OK)
+			fPrefsPath.Append("HexVexed_settings");
 	}
-	printf("Path: %s\n", fPrefsPath.Path());
 }
 
 
