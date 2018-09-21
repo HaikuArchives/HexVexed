@@ -147,11 +147,11 @@ MainWindow::MainWindow(void)
 			break;
 	}
 
-	submenu = new BMenu("Tile Size");
+	submenu = new BMenu("Tile size");
 	submenu->AddItem(new BMenuItem("Small",new BMessage(M_SIZE1_TILES)));
 	submenu->AddItem(new BMenuItem("Medium",new BMessage(M_SIZE2_TILES)));
 	submenu->AddItem(new BMenuItem("Large",new BMessage(M_SIZE3_TILES)));
-	submenu->AddItem(new BMenuItem("Extra Large",new BMessage(M_SIZE4_TILES)));
+	submenu->AddItem(new BMenuItem("Extra large",new BMessage(M_SIZE4_TILES)));
 	submenu->AddItem(new BMenuItem("Jumbo",new BMessage(M_SIZE5_TILES)));	
 	submenu->SetRadioMode(true);
 	menu->AddItem(submenu);
@@ -162,7 +162,7 @@ MainWindow::MainWindow(void)
 			break;
 		}
 	
-	submenu = new BMenu("Number Base");
+	submenu = new BMenu("Number base");
 	submenu->AddItem(new BMenuItem("Binary",new BMessage(M_SET_BINARY)));
 	submenu->AddItem(new BMenuItem("Quarternary",new BMessage(M_SET_QUARTERNARY)));
 	submenu->AddItem(new BMenuItem("Heximal",new BMessage(M_SET_HEXIMAL)));
@@ -199,9 +199,9 @@ MainWindow::MainWindow(void)
 	ScanBackgrounds();
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("How to Play…",new BMessage(M_HOW_TO_PLAY)));
+	menu->AddItem(new BMenuItem("How to play" B_UTF8_ELLIPSIS,new BMessage(M_HOW_TO_PLAY)));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("About HexVexed…",new BMessage(B_ABOUT_REQUESTED)));
+	menu->AddItem(new BMenuItem("About HexVexed",new BMessage(B_ABOUT_REQUESTED)));
 
 	BBox *timeBox = new BBox("box");
 	timeBox->ResizeTo(70, 34);
@@ -372,7 +372,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 		case M_HOW_TO_PLAY:
 		{
 			BString string =
-				"How to Play HexVexed:\n\n"
+				"How to play HexVexed:\n\n"
 				"Place the tiles in the grid on the right into the "
 				"grid on the left so that the numbers match wherever "
 				"one tile touches another. Easy to learn, tough to master.\n";
@@ -462,7 +462,7 @@ void MainWindow::GenerateGrid(uint8 size, bool newGame)
 	if (newGame) {
 		if (fTimer->Running()) {
 			BAlert* alert = new BAlert("",
-				"Do you want to abort the current game?", "No", "Yes");
+				"Do you want to abort the current game?", "Continue game", "Abort game");
 			alert->SetShortcut(0, B_ESCAPE);
 
 			if (alert->Go() == 0)

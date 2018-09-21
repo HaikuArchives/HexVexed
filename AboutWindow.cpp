@@ -19,7 +19,7 @@
 #define TRANSLATE(x) x
 
 AboutWindow::AboutWindow(void)
- : BWindow(BRect(100,100,500,400),"Lights Off!", B_MODAL_WINDOW_LOOK,
+ : BWindow(BRect(100,100,500,400),"HexVexed", B_MODAL_WINDOW_LOOK,
  	B_MODAL_APP_WINDOW_FEEL,
  	B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
 {
