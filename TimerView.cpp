@@ -5,7 +5,8 @@
 TimerView::TimerView()
 	:
 	BTextView("timer"),
-	fRunning(false)
+	fRunning(false),
+	elapsedTime(0)
 {
 	SetStylable(true);
 	MakeEditable(false);
@@ -30,16 +31,17 @@ bool TimerView::Running()
 void TimerView::Stop()
 {
 	fRunning = false;
+	elapsedTime = Elapsed();
 }
 
 int TimerView::Elapsed()
 {
-	return fRunning ? (system_time() - fStartTime) / 1000 / 1000 : 0;
+	return (system_time() - fStartTime) / 1000 / 1000;
 }
 
 void TimerView::Pulse()
 {
-	bigtime_t elapsed = Elapsed();
+	bigtime_t elapsed = fRunning ? Elapsed() : elapsedTime;
 	int mins = elapsed / 60;
 	int secs = elapsed % 60;
 
