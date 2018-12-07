@@ -19,7 +19,6 @@ public:
 private:
 	bool fRunning;
 	bigtime_t fStartTime;
-	int elapsedTime;
 };
 
 #endif
