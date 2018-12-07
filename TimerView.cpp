@@ -34,7 +34,7 @@ void TimerView::Stop()
 
 int TimerView::Elapsed()
 {
-	return (system_time() - fStartTime) / 1000 / 1000;
+	return fRunning ? (system_time() - fStartTime) / 1000 / 1000 : 0;
 }
 
 void TimerView::Pulse()
