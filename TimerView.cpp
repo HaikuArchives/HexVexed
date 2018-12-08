@@ -39,6 +39,9 @@ int TimerView::Elapsed()
 
 void TimerView::Pulse()
 {
+	if (!fRunning)
+		return;
+		
 	bigtime_t elapsed = Elapsed();
 	int mins = elapsed / 60;
 	int secs = elapsed % 60;
