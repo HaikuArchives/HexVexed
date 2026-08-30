@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2017 Scott McCreary
+ * Copyright 2009-2026 Scott McCreary
  * Copyright 2014-2016 Puck Meerburg
  * Copyright 2013 Luke (noryb009)
  * Based on BeVexed by DarkWyrm Copyright 2007-2009
@@ -8,14 +8,15 @@
  *
  */
 
-#include "HexTileView.h"
-#include "HexTile.h"
-#include <Font.h>
 #include <Bitmap.h>
-#include <String.h>
-#include <stdio.h>
+#include <Font.h>
 #include <Message.h>
+#include <stdio.h>
+#include <String.h>
 #include <Window.h>
+#include "HexTile.h"
+#include "HexTileView.h"
+
 
 static bool sInit=false;
 
@@ -566,6 +567,14 @@ void HexTileView::MessageReceived(BMessage *msg)
 	msg->PrintToStream();
 	if(msg->WasDropped())
 	{
+		int32 sourceTeam;
+		if(msg->FindInt32("hexvexed:team", &sourceTeam) != B_OK
+			|| Window() == NULL || sourceTeam != Window()->Team()) {
+				printf("Dropped tile from another instance - rejected!\n");
+				msg->SendReply(B_MESSAGE_NOT_UNDERSTOOD);
+				return;
+		}
+		
 		printf("Dropped tile\n");
 		HexTile *tile = dynamic_cast<HexTile *>(HexTile::Instantiate(msg));
 		
@@ -637,6 +646,9 @@ void HexTileView::DoDrag(void)
 
 	if(GetTile()->Archive(&msg) != B_OK)
 		debugger("Archiving failed!");
+	
+	if(Window())
+		msg.AddInt32("hexvexed:team", Window()->Team());
 
 	*fOtherTile = *fTile;
 	fTile->MakeEmpty();
