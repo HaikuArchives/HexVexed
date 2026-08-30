@@ -607,13 +607,9 @@ void HexTileView::MessageReceived(BMessage *msg)
 
 	if(msg->what == B_MESSAGE_NOT_UNDERSTOOD) {
 		printf("Drop failed\n");
-		
 		fOtherTile->PrintToStream();
 		fTile->PrintToStream();
-		
-		HexTile *tile = fOtherTile;
-		fOtherTile = fTile;
-		fTile = tile;
+		*fTile = *fOtherTile;
 		fTile->gridid = fGridId;
 		Invalidate();
 		return;
