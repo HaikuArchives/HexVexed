@@ -219,7 +219,7 @@ MainWindow::MainWindow(void)
 	fTimer->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fTimer->SetAlignment(B_ALIGN_CENTER);
 	timeBox->AddChild(fTimer);
-
+    SetPulseRate(500000);
 	GenerateGrid(fGridSize, true);
 
 	BPoint corner;

@@ -1,6 +1,16 @@
-#include "TimerView.h"
+/*
+ * Copyright 2026 Scott McCreary
+ * Copyright 2018 Claire
+ * Copyright 2018 Owen
+ *
+ * Distributed under terms of the MIT License.
+ *
+ */
 
 #include <String.h>
+
+#include "TimerView.h"
+
 
 TimerView::TimerView()
 	:
@@ -10,6 +20,7 @@ TimerView::TimerView()
 	SetStylable(true);
 	MakeEditable(false);
 	MakeSelectable(false);
+	SetFlags(Flags() | B_PULSE_NEEDED);
 }
 
 void TimerView::AttachedToWindow()
