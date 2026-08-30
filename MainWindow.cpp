@@ -11,27 +11,27 @@
  */
 
 #include "MainWindow.h"
-#include <View.h>
+#include <Alert.h>
+#include <Box.h>
+#include <Bitmap.h>
+#include <Directory.h>
+#include <Entry.h>
 #include <Menu.h>
 #include <MenuItem.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <Alert.h>
-#include <Bitmap.h>
-#include <TranslationUtils.h>
-#include <Roster.h>
-#include <StringList.h>
 #include <Path.h>
 #include <PathFinder.h>
-#include <Entry.h>
-#include <Directory.h>
-#include <Box.h>
+#include <Roster.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <StringList.h>
+#include <TranslationUtils.h>
+#include <View.h>
 #include "AboutWindow.h"
-#include "Preferences.h"
+#include "HexGrid.h"
 #include "HexTile.h"
 #include "HexTileView.h"
-#include "HexGrid.h"
 #include "ImageAlert.h"
+#include "Preferences.h"
 
 enum
 {
@@ -475,10 +475,10 @@ void MainWindow::GenerateGrid(uint8 size, bool newGame)
 			if (alert->Go() == 0)
 				return;
 
-			fGameOver = false;
 			fTimer->Stop();
 		}
-
+		fGameOver = false;
+			
 		delete fGrid;
 		delete fWorkGrid;
 
