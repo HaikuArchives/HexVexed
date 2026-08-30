@@ -1,7 +1,7 @@
 /*
+ * Copyright 2009-2026 Scott McCreary
  * Copyright 2018 Humdinger
  * Copyright 2017-2018 Owen
- * Copyright 2009-2017 Scott McCreary
  * Copyright 2014-2016 Puck Meerburg
  * Copyright 2013 Luke (noryb009)
  * Based on BeVexed by DarkWyrm Copyright 2007-2009
@@ -72,7 +72,8 @@ MainWindow::MainWindow(void)
  :	BWindow(BRect(100,100,500,400),"HexVexed",B_TITLED_WINDOW_LOOK,
  	B_NORMAL_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE),
  	fGrid(NULL),
- 	fWorkGrid(NULL)
+ 	fWorkGrid(NULL),
+ 	fGameOver(false)
 {
 	BPath path;
 	BPathFinder pathFinder;
@@ -391,6 +392,11 @@ void MainWindow::MessageReceived(BMessage *msg)
 				msg->SendReply(B_MESSAGE_NOT_UNDERSTOOD);
 				break;
 			}
+			
+			if (fGameOver) {
+				originalMsg.SendReply(B_MESSAGE_NOT_UNDERSTOOD);
+				break;
+			}
 
 			// If we're dropping to the storage grid
 			if(to->GridId() == fGrid->Id())
@@ -413,8 +419,9 @@ void MainWindow::MessageReceived(BMessage *msg)
 					tile->gridid = to->GridId();
 					to->Invalidate();
 
-					if(fWorkGrid->IsSolved())
+					if(fWorkGrid->IsSolved() && !fGameOver)
 					{
+						fGameOver = true;
 						fTimer->Stop();
 						ImageAlert *alert = new ImageAlert("HexVexedYouWin.png",'PNG ');
 						alert->Show();
@@ -468,6 +475,7 @@ void MainWindow::GenerateGrid(uint8 size, bool newGame)
 			if (alert->Go() == 0)
 				return;
 
+			fGameOver = false;
 			fTimer->Stop();
 		}
 

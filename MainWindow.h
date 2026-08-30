@@ -49,6 +49,7 @@ private:
 	
 	BString fBackPath;
 	BString fBackName;
+	bool fGameOver;
 };
 
 #endif
