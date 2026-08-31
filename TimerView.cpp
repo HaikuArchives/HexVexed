@@ -25,6 +25,7 @@ TimerView::TimerView()
 
 void TimerView::AttachedToWindow()
 {
+	BTextView::AttachedToWindow();
 }
 
 void TimerView::Start()
@@ -62,4 +63,5 @@ void TimerView::Pulse()
 
 	Delete(0,TextLength());
 	Insert(str);
+	Invalidate();
 }
