@@ -398,7 +398,6 @@ void MainWindow::MessageReceived(BMessage *msg)
 				break;
 			}
 
-			// If we're dropping to the storage grid
 			if(to->GridId() == fGrid->Id())
 			{
 				if (!to->GetTile()->IsEmpty()) {
@@ -423,7 +422,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 					{
 						fGameOver = true;
 						fTimer->Stop();
-						ImageAlert *alert = new ImageAlert("HexVexedYouWin.png",'PNG ');
+						ImageAlert *alert = new ImageAlert("HexVexedYouWin.png",'PNG ', Frame());
 						alert->Show();
 					}
 				} else {
