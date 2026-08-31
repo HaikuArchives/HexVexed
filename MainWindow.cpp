@@ -260,7 +260,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 	{
 		case B_ABOUT_REQUESTED:
 		{
-			AboutWindow *ab = new AboutWindow();
+			AboutWindow *ab = new AboutWindow(Frame());
 			ab->Show();
 			break;
 		}

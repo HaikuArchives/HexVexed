@@ -51,7 +51,7 @@ public:
 class AboutWindow : public BWindow
 {
 public:
-	AboutWindow(void);
+	AboutWindow(BRect parentFrame = BRect());
 };
 
 #endif
