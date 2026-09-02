@@ -564,7 +564,7 @@ void HexTileView::MouseUp(BPoint pt)
 
 void HexTileView::MessageReceived(BMessage *msg)
 {
-	msg->PrintToStream();
+	// msg->PrintToStream();
 	if(msg->WasDropped())
 	{
 		int32 sourceTeam;

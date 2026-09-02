@@ -27,6 +27,7 @@
 #include <TranslationUtils.h>
 #include <View.h>
 #include "AboutWindow.h"
+#include "BestTimes.h"
 #include "HexGrid.h"
 #include "HexTile.h"
 #include "HexTileView.h"
@@ -93,6 +94,8 @@ MainWindow::MainWindow(void)
 	Preferences::Init();
 	Preferences::LockPreferences();
 	Preferences::Load();
+
+	BestTimes::Init();
 
 	if(Preferences::Message().FindInt8("gridsize",(int8*)&fGridSize)!=B_OK
 		|| Preferences::Message().FindInt8("tilesize", (int8 *)&fTileSize)!=B_OK
@@ -421,7 +424,12 @@ void MainWindow::MessageReceived(BMessage *msg)
 					if(fWorkGrid->IsSolved() && !fGameOver)
 					{
 						fGameOver = true;
+						int32 elapsed = fTimer->Elapsed();
 						fTimer->Stop();
+
+						BestTimes::AddTime(fNumberBase, fGridSize, elapsed);
+						BestTimes::PrintBestTimes(fNumberBase, fGridSize);
+
 						ImageAlert *alert = new ImageAlert("HexVexedYouWin.png",'PNG ', Frame());
 						alert->Show();
 					}

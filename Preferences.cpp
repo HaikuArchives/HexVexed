@@ -117,7 +117,7 @@ Preferences::Load()
 status_t
 Preferences::LockPreferences()
 {
-	return fPrefsLock.Lock();
+	return fPrefsLock.Lock() ? B_OK : B_ERROR;
 }
 
 
