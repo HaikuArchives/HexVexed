@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 Scott McCreary
+ * Copyright 2009-2026 Scott McCreary
  * Based on BeVexed by DarkWyrm Copyright 2007-2009
  *
  * Distributed under terms of the MIT License.
@@ -49,6 +49,7 @@ private:
 	
 	BString fBackPath;
 	BString fBackName;
+	bool fGameOver;
 };
 
 #endif

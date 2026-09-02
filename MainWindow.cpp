@@ -1,7 +1,7 @@
 /*
+ * Copyright 2009-2026 Scott McCreary
  * Copyright 2018 Humdinger
  * Copyright 2017-2018 Owen
- * Copyright 2009-2017 Scott McCreary
  * Copyright 2014-2016 Puck Meerburg
  * Copyright 2013 Luke (noryb009)
  * Based on BeVexed by DarkWyrm Copyright 2007-2009
@@ -11,27 +11,28 @@
  */
 
 #include "MainWindow.h"
-#include <View.h>
+#include <Alert.h>
+#include <Box.h>
+#include <Bitmap.h>
+#include <Directory.h>
+#include <Entry.h>
 #include <Menu.h>
 #include <MenuItem.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <Alert.h>
-#include <Bitmap.h>
-#include <TranslationUtils.h>
-#include <Roster.h>
-#include <StringList.h>
 #include <Path.h>
 #include <PathFinder.h>
-#include <Entry.h>
-#include <Directory.h>
-#include <Box.h>
+#include <Roster.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <StringList.h>
+#include <TranslationUtils.h>
+#include <View.h>
 #include "AboutWindow.h"
-#include "Preferences.h"
+#include "BestTimes.h"
+#include "HexGrid.h"
 #include "HexTile.h"
 #include "HexTileView.h"
-#include "HexGrid.h"
 #include "ImageAlert.h"
+#include "Preferences.h"
 
 enum
 {
@@ -72,7 +73,8 @@ MainWindow::MainWindow(void)
  :	BWindow(BRect(100,100,500,400),"HexVexed",B_TITLED_WINDOW_LOOK,
  	B_NORMAL_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE),
  	fGrid(NULL),
- 	fWorkGrid(NULL)
+ 	fWorkGrid(NULL),
+ 	fGameOver(false)
 {
 	BPath path;
 	BPathFinder pathFinder;
@@ -92,6 +94,8 @@ MainWindow::MainWindow(void)
 	Preferences::Init();
 	Preferences::LockPreferences();
 	Preferences::Load();
+
+	BestTimes::Init();
 
 	if(Preferences::Message().FindInt8("gridsize",(int8*)&fGridSize)!=B_OK
 		|| Preferences::Message().FindInt8("tilesize", (int8 *)&fTileSize)!=B_OK
@@ -218,7 +222,7 @@ MainWindow::MainWindow(void)
 	fTimer->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fTimer->SetAlignment(B_ALIGN_CENTER);
 	timeBox->AddChild(fTimer);
-
+    SetPulseRate(500000);
 	GenerateGrid(fGridSize, true);
 
 	BPoint corner;
@@ -259,7 +263,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 	{
 		case B_ABOUT_REQUESTED:
 		{
-			AboutWindow *ab = new AboutWindow();
+			AboutWindow *ab = new AboutWindow(Frame());
 			ab->Show();
 			break;
 		}
@@ -391,8 +395,12 @@ void MainWindow::MessageReceived(BMessage *msg)
 				msg->SendReply(B_MESSAGE_NOT_UNDERSTOOD);
 				break;
 			}
+			
+			if (fGameOver) {
+				originalMsg.SendReply(B_MESSAGE_NOT_UNDERSTOOD);
+				break;
+			}
 
-			// If we're dropping to the storage grid
 			if(to->GridId() == fGrid->Id())
 			{
 				if (!to->GetTile()->IsEmpty()) {
@@ -413,10 +421,16 @@ void MainWindow::MessageReceived(BMessage *msg)
 					tile->gridid = to->GridId();
 					to->Invalidate();
 
-					if(fWorkGrid->IsSolved())
+					if(fWorkGrid->IsSolved() && !fGameOver)
 					{
+						fGameOver = true;
+						int32 elapsed = fTimer->Elapsed();
 						fTimer->Stop();
-						ImageAlert *alert = new ImageAlert("HexVexedYouWin.png",'PNG ');
+
+						BestTimes::AddTime(fNumberBase, fGridSize, elapsed);
+						BestTimes::PrintBestTimes(fNumberBase, fGridSize);
+
+						ImageAlert *alert = new ImageAlert("HexVexedYouWin.png",'PNG ', Frame());
 						alert->Show();
 					}
 				} else {
@@ -470,7 +484,8 @@ void MainWindow::GenerateGrid(uint8 size, bool newGame)
 
 			fTimer->Stop();
 		}
-
+		fGameOver = false;
+			
 		delete fGrid;
 		delete fWorkGrid;
 

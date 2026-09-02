@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 Scott McCreary
+ * Copyright 2009-2026 Scott McCreary
  * Based on BeVexed by DarkWyrm Copyright 2007-2009
  *
  * Distributed under terms of the MIT License.
@@ -18,18 +18,24 @@
 // In case I want to localize this later
 #define TRANSLATE(x) x
 
-AboutWindow::AboutWindow(void)
+AboutWindow::AboutWindow(BRect parentFrame)
  : BWindow(BRect(100,100,500,400),"HexVexed", B_MODAL_WINDOW_LOOK,
  	B_MODAL_APP_WINDOW_FEEL,
  	B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
 {
-	BScreen screen;
-	BRect screenrect(screen.Frame());
-	
 	AboutView *aboutview=new AboutView(Bounds());
 	AddChild(aboutview);
 	
-	MoveTo( (screenrect.Width()-Frame().Width())/2, (screenrect.Height()-Frame().Height())/2 );
+	BRect centerOn;
+	if (parentFrame.IsValid()){
+		centerOn = parentFrame;
+	} else {
+		BScreen screen;
+		centerOn = screen.Frame();
+	}
+
+	MoveTo(centerOn.left + (centerOn.Width() - Frame().Width()) / 2,
+		centerOn.top + (centerOn.Height() - Frame().Height()) / 2);
 }
 
 AboutView::AboutView(BRect frame)
@@ -78,8 +84,8 @@ AboutView::AboutView(BRect frame)
 	font_height height;
 	be_plain_font->GetHeight(&height);
 	
-	versionpos.y=height.ascent+height.descent+height.leading+5;
-	versionpos.x=fLogo->Bounds().right - 5 - StringWidth(version);
+	versionpos.x = (fLogo->Bounds().Width() - StringWidth(version)) / 2;
+	versionpos.y = fLogo->Bounds().bottom - 5 - height.descent;
 	
 	SetDrawingMode(B_OP_OVER);
 }
@@ -102,6 +108,6 @@ void AboutView::AttachedToWindow(void)
 void AboutView::Draw(BRect update)
 {
 	DrawBitmap(fLogo, BPoint(0,0));
-//	SetHighColor(224,224,224);
-//	DrawString(version,versionpos);
+	SetHighColor(0,0,0,180);
+	DrawString(version,versionpos);
 }
