@@ -6,13 +6,21 @@
  */
 #include "BestTimes.h"
 
+#include <algorithm>
+#include <Application.h>
+#include <AppFileInfo.h>
 #include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <Roster.h>
+#include <String.h>
 #include <stdio.h>
-
-#include <algorithm>
+#include <Screen.h>
+#include <TranslationUtils.h>
 #include <vector>
+
+// In case I want to localize this later
+#define TRANSLATE(x) x
 
 BLocker BestTimes::fBestTimesLock;
 BPath BestTimes::fBestTimesPath;
@@ -25,6 +33,7 @@ BString BestTimes::KeyFor(uint8 numberBase, uint8 gridSize)
 	return key;
 }
 
+
 void BestTimes::Init()
 {
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &fBestTimesPath) == B_OK) {
@@ -36,6 +45,7 @@ void BestTimes::Init()
 	}
 	printf("BestTimes path: %s\n", fBestTimesPath.Path());
 }
+
 
 status_t BestTimes::Save()
 {
@@ -63,15 +73,18 @@ status_t BestTimes::Load()
 	return fBestTimes.Unflatten(&file);
 }
 
+
 status_t BestTimes::LockBestTimes()
 {
 	return fBestTimesLock.Lock() ? B_OK : B_ERROR;
 }
 
+
 void BestTimes::UnlockBestTimes()
 {
 	fBestTimesLock.Unlock();
 }
+
 
 BMessage & BestTimes::Message()
 {
@@ -79,6 +92,7 @@ BMessage & BestTimes::Message()
 		return *(BMessage *)NULL;
 	return fBestTimes;
 }
+
 
 void BestTimes::AddTime(uint8 numberBase, uint8 gridSize, int32 seconds)
 {
@@ -109,6 +123,7 @@ void BestTimes::AddTime(uint8 numberBase, uint8 gridSize, int32 seconds)
 	UnlockBestTimes();
 }
 
+
 void BestTimes::PrintBestTimes(uint8 numberBase, uint8 gridSize)
 {
 	if (LockBestTimes() != B_OK)
@@ -129,4 +144,93 @@ void BestTimes::PrintBestTimes(uint8 numberBase, uint8 gridSize)
 		printf("  (no times recorded yet)\n");
 
 	UnlockBestTimes();
+}
+
+
+BestTimesWindow::BestTimesWindow(BRect parentFrame, uint8 numberBase, uint8 gridSize)
+ : BWindow(BRect(100,100,5000,400),"BestTimes", B_MODAL_WINDOW_LOOK,
+ 	B_MODAL_APP_WINDOW_FEEL,
+ 	B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
+{
+	BestTimesView *besttimesview=new BestTimesView(Bounds());
+	AddChild(besttimesview);
+
+	BRect centerOn;
+	if (parentFrame.IsValid()){
+		centerOn = parentFrame;
+	} else {
+		BScreen screen;
+		centerOn = screen.Frame();
+	}
+
+	MoveTo(centerOn.left + (centerOn.Width() - Frame().Width()) / 2,
+		centerOn.top + (centerOn.Height() - Frame().Height()) / 2);
+}
+
+
+BestTimesView::BestTimesView(BRect frame)
+ : BView (frame, "BestTimesView", B_FOLLOW_ALL, B_WILL_DRAW)
+{
+	SetViewColor(126,126,190);
+
+	fLogo=BTranslationUtils::GetBitmap('PNG ',"HexVexedAbout.png");  //reuse this one for now
+
+	app_info ai;
+	version_info vi;
+	be_app->GetAppInfo(&ai);
+	BFile file(&ai.ref,B_READ_ONLY);
+	BAppFileInfo appinfo(&file);
+	appinfo.GetVersionInfo(&vi,B_APP_VERSION_KIND);
+}
+
+
+BestTimesView::~BestTimesView(void)
+{
+	delete fLogo;
+}
+
+
+void BestTimesView::MouseDown(BPoint pt)
+{
+	Window()->PostMessage(B_QUIT_REQUESTED);
+}
+
+
+void BestTimesView::AttachedToWindow(void)
+{
+	Window()->ResizeTo(fLogo->Bounds().Width(),fLogo->Bounds().Height());
+}
+
+
+void BestTimesView::Draw(BRect frame, uint8 numberBase, uint8 gridSize)
+{
+	sprintf(besttimestext,"This is a test");
+	DrawBitmap(fLogo, BPoint(0,0));
+	SetHighColor(0,0,0,180);
+	textpos.x = 50;
+	textpos.y = 50;
+	DrawString(besttimestext,textpos);
+
+	if (BestTimes::LockBestTimes() != B_OK)
+		return;
+
+	BestTimes::Load();
+
+	BString key = BestTimes::KeyFor(numberBase, gridSize);
+	printf("Best times (number base %u, grid size %u):\n", numberBase, gridSize);
+
+	int32 seconds;
+	int32 rank = 0;
+	textpos.x = 50;
+	textpos.y = 50;
+	for (int32 i = 0; BestTimes::fBestTimes.FindInt32(key.String(), i, &seconds) == B_OK; i++) {
+		rank++;
+		printf("  %2d. %02d:%02d\n", rank, seconds / 60, seconds % 60);
+		textpos.y = 50 + i *15;
+		sprintf(besttimestext, "  %2d. %02d:%02d\n", rank, seconds / 60, seconds % 60, textpos);
+	}
+	if (rank == 0)
+		printf("  (no times recorded yet)\n");
+
+	BestTimes::UnlockBestTimes();
 }

@@ -11,6 +11,7 @@
  */
 
 #include "MainWindow.h"
+
 #include <Alert.h>
 #include <Box.h>
 #include <Bitmap.h>
@@ -60,7 +61,8 @@ enum
 	M_SET_DECIMAL,
 	M_SET_HEXADECIMAL,
 
-	M_HOW_TO_PLAY
+	M_HOW_TO_PLAY,
+	M_BEST_TIMES
 };
 
 static const float cos30 = 0.866;
@@ -204,6 +206,7 @@ MainWindow::MainWindow(void)
 
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("How to play" B_UTF8_ELLIPSIS,new BMessage(M_HOW_TO_PLAY)));
+	menu->AddItem(new BMenuItem("Best Times",new BMessage(M_BEST_TIMES)));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("About HexVexed",new BMessage(B_ABOUT_REQUESTED)));
 
@@ -265,6 +268,12 @@ void MainWindow::MessageReceived(BMessage *msg)
 		{
 			AboutWindow *ab = new AboutWindow(Frame());
 			ab->Show();
+			break;
+		}
+		case M_BEST_TIMES:
+		{
+			BestTimesWindow *bt = new BestTimesWindow(Frame(),fNumberBase ,fGridSize);
+			bt->Show();
 			break;
 		}
 		case M_NEW_GAME:
