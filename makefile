@@ -35,8 +35,8 @@ APP_MIME_SIG=
 #	are included from different directories.  Also note that spaces
 #	in folder names do not work well with this makefile.
 SRCS= AboutWindow.cpp App.cpp \
-	HexGrid.cpp HexTile.cpp \
-	HexTileView.cpp ImageAlert.cpp \
+	BestTimes.cpp HexGrid.cpp \
+	HexTile.cpp HexTileView.cpp ImageAlert.cpp \
 	MainWindow.cpp Preferences.cpp TimerView.cpp
 
 #	specify the resource definition files to use

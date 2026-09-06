@@ -1,20 +1,22 @@
 /*
- * Copyright 2009-2012 Scott McCreary
+ * Copyright 2009-2026 Scott McCreary
  * Based on BeVexed by DarkWyrm Copyright 2007-2009
  *
  * Distributed under terms of the MIT License.
  *
  */
+
 #ifndef IMAGEALERT_H
 #define IMAGEALERT_H
 
-#include <Window.h>
-#include <View.h>
 #include <Bitmap.h>
 #include <Button.h>
-#include <Messenger.h>
 #include <Font.h>
+#include <Messenger.h>
 #include <StatusBar.h>
+#include <View.h>
+#include <Window.h>
+
 
 class AlertView : public BView
 {
@@ -37,7 +39,7 @@ public:
 class ImageAlert : public BWindow
 {
 public:
-	ImageAlert(const char *image, int32 format);
+	ImageAlert(const char *image, int32 format, BRect parentFrame = BRect());
 };
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012 Scott McCreary
+ * Copyright 2009-2026 Scott McCreary
  * Based on BeVexed by DarkWyrm Copyright 2007-2009
  *
  * Distributed under terms of the MIT License.
@@ -18,18 +18,24 @@
 // In case I want to localize this later
 #define TRANSLATE(x) x
 
-ImageAlert::ImageAlert(const char *image, int32 format)
+ImageAlert::ImageAlert(const char *image, int32 format, BRect parentFrame)
  : BWindow(BRect(100,100,500,400),"", B_MODAL_WINDOW_LOOK,
  	B_MODAL_APP_WINDOW_FEEL,
  	B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
 {
-	BScreen screen;
-	BRect screenrect(screen.Frame());
-	
 	AlertView *alertview=new AlertView(Bounds(),image, format);
 	AddChild(alertview);
 	
-	MoveTo( (screenrect.Width()-Frame().Width())/2, (screenrect.Height()-Frame().Height())/2 );
+	BRect centerOn;
+	if (parentFrame.IsValid()) {
+		centerOn = parentFrame;
+	} else {
+		BScreen screen;
+		centerOn = screen.Frame();
+	}
+	
+	MoveTo(centerOn.left + (centerOn.Width() - Frame().Width())/2, 
+		centerOn.top + (centerOn.Height() - Frame().Height())/2 );
 }
 
 AlertView::AlertView(BRect frame,const char *image, int32 format)
