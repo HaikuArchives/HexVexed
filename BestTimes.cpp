@@ -281,12 +281,18 @@ void BestTimesView::Draw(BRect update)
 {
 	DrawBitmap(fLogo, BPoint(0,0));
 	SetHighColor(0,0,0,180);
-
+	BFont font;
+	font.SetSize(18);
+	SetFont(&font);
+	float textwidth;
 	textpos.x = 50;
+	BPoint center(update.left + (update.Width() /2), update.top + (update.Height() /2));
 
 	if(fTimes.empty()) {
 		textpos.y = 50;
 		sprintf(besttimestext, "(no times recorded yet)");
+		textwidth = StringWidth(besttimestext);
+		textpos.x = center.x - (textwidth / 2);
 		DrawString(besttimestext, textpos);
 		return;
 	}
@@ -295,9 +301,11 @@ void BestTimesView::Draw(BRect update)
 	for (std::vector<BestTimeEntry>::const_iterator it = fTimes.begin(); it != fTimes.end(); ++it) {
 		rank++;
 		// printf("  %2d. %02d:%02d\n", rank, seconds / 60, seconds % 60);
-		textpos.y = 50 + (rank - 1) * 15;
+		textpos.y = 130 + (rank - 1) * 30;
 		sprintf(besttimestext, "  %2d. %02d:%02d   %s", rank, it->seconds / 60, it->seconds % 60,
 			it->date.String());
+		textwidth = StringWidth(besttimestext);
+		textpos.x = center.x - (textwidth / 2);
 		DrawString(besttimestext, textpos);
 	}
 }
