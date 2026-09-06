@@ -17,6 +17,7 @@
 #include <StatusBar.h>
 #include <String.h>
 #include <SupportDefs.h>
+#include <vector>
 #include <View.h>
 #include <Window.h>
 
@@ -43,6 +44,13 @@ enum
 // everywhere BestTimes is used.
 #define TOPXTIMES 10
 
+
+struct BestTimeEntry {
+	int32 seconds;
+	BString date; // YYYY-MM-DD
+};
+
+
 class BestTimes {
 public:
 	static void Init();
@@ -57,13 +65,14 @@ public:
 	static void AddTime(uint8 numberBase, uint8 gridSize, int32 seconds);
 
 	static void PrintBestTimes(uint8 numberBase, uint8 gridSize);
-	static BMessage fBestTimes;
 	static BString KeyFor(uint8 numberBase, uint8 gridSize);
+	static BString DateKeyFor(uint8 numberBase, uint8 gridSize);
 
 private:
 
 	static BLocker fBestTimesLock;
 	static BPath fBestTimesPath;
+	static BMessage fBestTimes;
 
 };
 
@@ -71,10 +80,10 @@ private:
 class BestTimesView : public BView
 {
 public:
-	BestTimesView(BRect frame);
+	BestTimesView(BRect frame, uint8 numberBase, uint8 gridSize);
 	~BestTimesView(void);
 	void AttachedToWindow(void);
-	void Draw(BRect update, uint8 numberBase, uint8 gridSize);
+	void Draw(BRect update);
 	void MouseDown(BPoint pt);
 
 	BBitmap *fLogo;
@@ -82,8 +91,14 @@ public:
 	char besttimestext[64];
 	BPoint textpos;
 
-	uint8 fAboutFlags;
+	uint8 fNumberBase;
+	uint8 fGridSize;
 	int32 fEntryCount;
+
+private:
+	void LoadTimes(void);
+
+	std::vector<BestTimeEntry> fTimes;
 };
 
 class BestTimesWindow : public BWindow

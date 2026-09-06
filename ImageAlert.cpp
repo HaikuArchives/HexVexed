@@ -11,7 +11,6 @@
 #include <Roster.h>
 #include <String.h>
 #include <stdio.h>
-#include <Screen.h>
 #include <TranslationUtils.h>
 #include "ImageAlert.h"
 
@@ -26,16 +25,10 @@ ImageAlert::ImageAlert(const char *image, int32 format, BRect parentFrame)
 	AlertView *alertview=new AlertView(Bounds(),image, format);
 	AddChild(alertview);
 	
-	BRect centerOn;
-	if (parentFrame.IsValid()) {
-		centerOn = parentFrame;
-	} else {
-		BScreen screen;
-		centerOn = screen.Frame();
-	}
-	
-	MoveTo(centerOn.left + (centerOn.Width() - Frame().Width())/2, 
-		centerOn.top + (centerOn.Height() - Frame().Height())/2 );
+	if (parentFrame.IsValid())
+		CenterIn(parentFrame);
+	else
+		CenterOnScreen();
 }
 
 AlertView::AlertView(BRect frame,const char *image, int32 format)

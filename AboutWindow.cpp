@@ -26,16 +26,10 @@ AboutWindow::AboutWindow(BRect parentFrame)
 	AboutView *aboutview=new AboutView(Bounds());
 	AddChild(aboutview);
 	
-	BRect centerOn;
-	if (parentFrame.IsValid()){
-		centerOn = parentFrame;
-	} else {
-		BScreen screen;
-		centerOn = screen.Frame();
-	}
-
-	MoveTo(centerOn.left + (centerOn.Width() - Frame().Width()) / 2,
-		centerOn.top + (centerOn.Height() - Frame().Height()) / 2);
+	if (parentFrame.IsValid())
+		CenterIn(parentFrame);
+	else
+		CenterOnScreen();
 }
 
 AboutView::AboutView(BRect frame)
