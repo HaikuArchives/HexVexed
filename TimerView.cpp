@@ -23,10 +23,12 @@ TimerView::TimerView()
 	SetFlags(Flags() | B_PULSE_NEEDED);
 }
 
+
 void TimerView::AttachedToWindow()
 {
 	BTextView::AttachedToWindow();
 }
+
 
 void TimerView::Start()
 {
@@ -34,34 +36,47 @@ void TimerView::Start()
 	fStartTime = system_time();
 }
 
+
 bool TimerView::Running()
 {
 	return fRunning;
 }
 
+
 void TimerView::Stop()
 {
-	fRunning = false;
+	if(fRunning) {
+		fStopTime = system_time();
+		fRunning = false;
+		UpdateDisplay(Elapsed());
+	}
 }
+
 
 int TimerView::Elapsed()
 {
-	return fRunning ? (system_time() - fStartTime) / 1000 / 1000 : 0;
+	bigtime_t end = fRunning ? system_time() : fStopTime;
+	return (end - fStartTime) / 1000 / 1000;
 }
+
 
 void TimerView::Pulse()
 {
 	if (!fRunning)
 		return;
+
+	UpdateDisplay(Elapsed());
+}
+
 		
-	bigtime_t elapsed = Elapsed();
-	int mins = elapsed / 60;
-	int secs = elapsed % 60;
+void TimerView::UpdateDisplay(int seconds)
+{
+	int mins = seconds / 60;
+	int secs = seconds % 60;
 
 	BString str;
 	str.SetToFormat("%02d:%02d",mins,secs);
 
 	Delete(0,TextLength());
 	Insert(str);
-	Invalidate();
 }

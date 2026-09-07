@@ -108,8 +108,12 @@ void AboutView::Draw(BRect update)
 	SetHighColor(0,0,0,180);
 	BFont font;
 	font.SetSize(96);
+	font.SetFace(B_BOLD_FACE);
+	font.SetFace(B_OUTLINED_FACE);
 	SetFont(&font);
 	DrawStringCentered(this, "HexVexed", Bounds().Width() * 0.5, Bounds().Height() * 0.23);
+	font.SetFace(B_REGULAR_FACE);
+	font.SetFace(B_ITALIC_FACE);
 	font.SetSize(28);
 	SetFont(&font);
 	DrawStringCentered(this, "by Scott McCreary", Bounds().Width() * 0.5, Bounds().Height() * 0.35);

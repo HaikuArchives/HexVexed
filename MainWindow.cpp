@@ -437,8 +437,8 @@ void MainWindow::MessageReceived(BMessage *msg)
 					if(fWorkGrid->IsSolved() && !fGameOver)
 					{
 						fGameOver = true;
-						int32 elapsed = fTimer->Elapsed();
 						fTimer->Stop();
+						int32 elapsed = fTimer->Elapsed();
 
 						BestTimes::AddTime(fNumberBase, fGridSize, elapsed);
 						BestTimes::PrintBestTimes(fNumberBase, fGridSize);
