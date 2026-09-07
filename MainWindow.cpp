@@ -422,6 +422,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 				tile->gridid = to->GridId();
 				UpdateTileBackup(to->GetTile());
 				to->Invalidate();
+				VerifyBoardIntegrity();
 			}
 			else if(to->GridId() == fWorkGrid->Id())
 			{
@@ -431,6 +432,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 					tile->gridid = to->GridId();
 					UpdateTileBackup(to->GetTile());
 					to->Invalidate();
+					VerifyBoardIntegrity();
 
 					if(fWorkGrid->IsSolved() && !fGameOver)
 					{
@@ -451,7 +453,6 @@ void MainWindow::MessageReceived(BMessage *msg)
 			else
 				debugger("Programmer Error: Orphaned Tile");
 
-			VerifyBoardIntegrity();
 			break;
 		}
 		default:

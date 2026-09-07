@@ -118,11 +118,11 @@ void AboutView::Draw(BRect update)
 	DrawStringCentered(this, "Based on BeVexed", Bounds().Width() * 0.25, Bounds().Height() * 0.45);
 	DrawStringCentered(this, "by DarkWyrm", Bounds().Width() * 0.25, Bounds().Height() * 0.55);
 	DrawStringCentered(this, "Graphic and Icon", Bounds().Width() * 0.75, Bounds().Height() * 0.45);
-	DrawStringCentered(this, "by Stephanie Wu", Bounds().Width() * 0.75, Bounds().Height() * 0.55);
+	DrawStringCentered(this, "by Stephanie Fu", Bounds().Width() * 0.75, Bounds().Height() * 0.55);
 	font.SetSize(20);
 	SetFont(&font);
 	DrawStringCentered(this, "Other Contributers:", Bounds().Width() * 0.5, Bounds().Height() * 0.65);
-	DrawStringCentered(this, "Humdinger, OwenCA, Puck Meerburg, Luke (noryb009)", Bounds().Width() * 0.5, Bounds().Height() * 0.72);
+	DrawStringCentered(this, "Humdinger, Owen Pan, Puck Meerburg, Luke (noryb009)", Bounds().Width() * 0.5, Bounds().Height() * 0.72);
 	DrawStringCentered(this, "Ojasva Jain, Claire50", Bounds().Width() * 0.5, Bounds().Height() * 0.79);
 	//DrawStringCentered(this, "Big list of names here, this is a test", Bounds().Width() * 0.5, Bounds().Height() * 0.84);
 	font.SetSize(18);
