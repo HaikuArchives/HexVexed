@@ -11,17 +11,19 @@
 #include <Application.h>
 #include <Bitmap.h>
 #include <Entry.h>
+#include <map>
+#include <MenuBar.h>
 #include <Path.h>
+#include <Rect.h>
 #include <Roster.h>
 #include <Screen.h>
-#include <Window.h>
-#include <MenuBar.h>
-#include <Rect.h>
-#include <String.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <String.h>
 #include <TranslationUtils.h>
+#include <Window.h>
 
+#include "HexTile.h"
 #include "TimerView.h"
 
 class HexGrid;
@@ -37,7 +39,12 @@ private:
 	void	GenerateGrid(uint8 size, bool newGame);
 	void	ScanBackgrounds(void);
 	void	SetBackground(const char *name);
-	
+
+	std::map<uint16, HexTile> fTileBackup;
+
+	void	UpdateTileBackup(HexTile *tile);
+	void	VerifyBoardIntegrity(void);
+
 	HexGrid *fGrid, *fWorkGrid;
 	BView *fBack;
 	BMenuBar *fMenuBar;
@@ -46,7 +53,7 @@ private:
 	uint8 fGridSize;
 	uint8 fTileSize;
 	uint8 fNumberBase;
-	
+
 	BString fBackPath;
 	BString fBackName;
 	bool fGameOver;

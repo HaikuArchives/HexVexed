@@ -20,6 +20,8 @@
 #include <TranslationUtils.h>
 #include <vector>
 
+#include "DrawHelpers.h"
+
 // In case I want to localize this later
 #define TRANSLATE(x) x
 
@@ -279,14 +281,45 @@ void BestTimesView::AttachedToWindow(void)
 
 void BestTimesView::Draw(BRect update)
 {
-	DrawBitmap(fLogo, BPoint(0,0));
+	//DrawBitmap(fLogo, BPoint(0,0));
+	DrawTriangleBackground(this, Bounds());
 	SetHighColor(0,0,0,180);
 	BFont font;
-	font.SetSize(18);
+	font.SetSize(48);
 	SetFont(&font);
 	float textwidth;
 	textpos.x = 50;
 	BPoint center(update.left + (update.Width() /2), update.top + (update.Height() /2));
+
+	DrawStringCentered(this, "Best Times", Bounds().Width() * 0.5, Bounds().Height() * 0.15);
+	font.SetSize(24);
+	SetFont(&font);
+
+	switch(fNumberBase)
+	{
+		case 2:
+		sprintf(besttimestext, "Binary - Grid Size %u", fGridSize);
+			break;
+		case 4:
+		sprintf(besttimestext, "Quarternary - Grid Size %u", fGridSize);
+			break;
+		case 6:
+		sprintf(besttimestext, "Heximal - Grid Size %u", fGridSize);
+			break;
+		case 8:
+		sprintf(besttimestext, "Octal - Grid Size %u", fGridSize);
+			break;
+		case 10:
+		sprintf(besttimestext, "Decimal - Grid Size %u", fGridSize);
+			break;
+		case 16:
+			sprintf(besttimestext, "Hexidecimal - Grid Size %u", fGridSize);
+			break;
+	}
+
+	DrawStringCentered(this, besttimestext, Bounds().Width() * 0.5, Bounds().Height() * 0.22);
+	font.SetSize(18);
+	SetFont(&font);
 
 	if(fTimes.empty()) {
 		textpos.y = 50;
@@ -304,8 +337,8 @@ void BestTimesView::Draw(BRect update)
 		textpos.y = 130 + (rank - 1) * 30;
 		sprintf(besttimestext, "  %2d. %02d:%02d   %s", rank, it->seconds / 60, it->seconds % 60,
 			it->date.String());
-		textwidth = StringWidth(besttimestext);
-		textpos.x = center.x - (textwidth / 2);
-		DrawString(besttimestext, textpos);
+		DrawStringCentered(this, besttimestext, Bounds().Width() / 2, textpos.y);
+		DrawAppIcon(this, BPoint(Bounds().Width() * 0.2 , Bounds().Height() * 0.85), 96);
+		DrawAppIcon(this, BPoint(Bounds().Width() * 0.85 , Bounds().Height() * 0.85), 96);
 	}
 }

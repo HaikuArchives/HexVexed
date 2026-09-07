@@ -22,6 +22,7 @@
 #include <Path.h>
 #include <PathFinder.h>
 #include <Roster.h>
+#include <set>
 #include <stdio.h>
 #include <stdlib.h>
 #include <StringList.h>
@@ -419,7 +420,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 
 				*to->GetTile() = *tile;
 				tile->gridid = to->GridId();
-
+				UpdateTileBackup(to->GetTile());
 				to->Invalidate();
 			}
 			else if(to->GridId() == fWorkGrid->Id())
@@ -428,6 +429,7 @@ void MainWindow::MessageReceived(BMessage *msg)
 				{
 					*to->GetTile() = *tile;
 					tile->gridid = to->GridId();
+					UpdateTileBackup(to->GetTile());
 					to->Invalidate();
 
 					if(fWorkGrid->IsSolved() && !fGameOver)
@@ -448,6 +450,8 @@ void MainWindow::MessageReceived(BMessage *msg)
 			}
 			else
 				debugger("Programmer Error: Orphaned Tile");
+
+			VerifyBoardIntegrity();
 			break;
 		}
 		default:
@@ -502,6 +506,13 @@ void MainWindow::GenerateGrid(uint8 size, bool newGame)
 		fGrid->SetNumberBase(fNumberBase);
 		fGrid->GeneratePuzzle();
 
+		fTileBackup.clear();
+		for(int32 i = 0; i < (int32)size * size; i++) {
+			HexTile *t = fGrid->TileAt(i);
+			if(t && !t->IsEmpty())
+				fTileBackup[t->id] = *t;
+		}
+
 		fWorkGrid = new HexGrid(size, 1);
 
 		fTimer->Start();
@@ -531,6 +542,69 @@ void MainWindow::GenerateGrid(uint8 size, bool newGame)
 
 	fBack->ChildAt(1)->MoveTo((windowWidth - timerBox.Width()) / 2, timerY);
 	fBack->Invalidate();
+}
+
+
+void MainWindow::UpdateTileBackup(HexTile *tile)
+{
+	if(!tile || tile->IsEmpty())
+		return;
+
+	fTileBackup[tile->id] = *tile;
+}
+
+
+void MainWindow::VerifyBoardIntegrity(void)
+{
+	std::set<uint16> present;
+
+	for(int32 i = 0; i < fBack->CountChildren(); i++) {
+		HexTileView *view = dynamic_cast<HexTileView *>(fBack->ChildAt(i));
+		if(!view)
+			continue;
+
+		HexTile *tile = view->GetTile();
+		if(tile && !tile->IsEmpty())
+			present.insert(tile->id);
+	}
+
+	for(std::map<uint16, HexTile>::const_iterator it = fTileBackup.begin();
+			it != fTileBackup.end(); ++it) {
+		if(present.find(it->first) != present.end())
+			continue;
+
+		printf("VerifyBoardIntegrity: tile id=%u missing from board, restoring\n",
+			it->first);
+
+		HexTileView *fallback = NULL;
+		bool restored = false;
+
+		for(int32 i = 0; i < fBack->CountChildren() && !restored; i++) {
+			HexTileView *view = dynamic_cast<HexTileView *>(fBack->ChildAt(i));
+			if(!view)
+				continue;
+
+			HexTile *slot = view->GetTile();
+			if(!slot || !slot->IsEmpty())
+				continue;
+
+			if(view->GridId() == fGrid->Id()) {
+				*slot = it->second;
+				slot->gridid = fGrid->Id();
+				view->Invalidate();
+				restored = true;
+			} else if (!fallback) {
+				fallback = view;
+			}
+		}
+
+		if(!restored && fallback) {
+			HexTile *slot = fallback->GetTile();
+			*slot = it->second;
+			slot->gridid = fallback->GridId();
+			fallback->Invalidate();
+		}
+	}
 }
 
 void MainWindow::ScanBackgrounds(void)
