@@ -78,7 +78,7 @@ AboutView::AboutView(BRect frame)
 	
 	font_height height;
 	be_plain_font->GetHeight(&height);
-	versionpos.y = fLogo->Bounds().bottom - 5 - height.descent;
+	//versionpos.y = fLogo->Bounds().bottom - 5 - height.descent;
 
 	SetDrawingMode(B_OP_OVER);
 }
@@ -104,34 +104,35 @@ void AboutView::AttachedToWindow(void)
 
 void AboutView::Draw(BRect update)
 {
-	DrawTriangleBackground(this, Bounds());
+	BPoint boxsize;
+	boxsize.Set(Bounds().Width(), Bounds().Height());
+	DrawTriangleBackground(this, update);
 	SetHighColor(0,0,0,180);
 	BFont font;
 	font.SetSize(96);
 	font.SetFace(B_BOLD_FACE);
 	font.SetFace(B_OUTLINED_FACE);
 	SetFont(&font);
-	DrawStringCentered(this, "HexVexed", Bounds().Width() * 0.5, Bounds().Height() * 0.23);
+	DrawStringCentered(this, "HexVexed", boxsize.x * 0.5, boxsize.y * 0.23);
 	font.SetFace(B_REGULAR_FACE);
 	font.SetFace(B_ITALIC_FACE);
 	font.SetSize(28);
 	SetFont(&font);
-	DrawStringCentered(this, "by Scott McCreary", Bounds().Width() * 0.5, Bounds().Height() * 0.35);
+	DrawStringCentered(this, "by Scott McCreary", boxsize.x * 0.5, boxsize.y * 0.35);
 	font.SetSize(24);
 	SetFont(&font);
-	DrawStringCentered(this, "Based on BeVexed", Bounds().Width() * 0.25, Bounds().Height() * 0.45);
-	DrawStringCentered(this, "by DarkWyrm", Bounds().Width() * 0.25, Bounds().Height() * 0.55);
-	DrawStringCentered(this, "Graphic and Icon", Bounds().Width() * 0.75, Bounds().Height() * 0.45);
-	DrawStringCentered(this, "by Stephanie Fu", Bounds().Width() * 0.75, Bounds().Height() * 0.55);
+	DrawStringCentered(this, "Based on BeVexed", boxsize.x * 0.25, boxsize.y * 0.45);
+	DrawStringCentered(this, "by DarkWyrm", boxsize.x * 0.25, boxsize.y * 0.55);
+	DrawStringCentered(this, "Icon and Graphics", boxsize.x * 0.75, boxsize.y * 0.45);
+	DrawStringCentered(this, "by Stephanie Fu", boxsize.x * 0.75, boxsize.y * 0.55);
 	font.SetSize(20);
 	SetFont(&font);
-	DrawStringCentered(this, "Other Contributers:", Bounds().Width() * 0.5, Bounds().Height() * 0.65);
-	DrawStringCentered(this, "Humdinger, Owen Pan, Puck Meerburg, Luke (noryb009)", Bounds().Width() * 0.5, Bounds().Height() * 0.72);
-	DrawStringCentered(this, "Ojasva Jain, Claire50", Bounds().Width() * 0.5, Bounds().Height() * 0.79);
-	//DrawStringCentered(this, "Big list of names here, this is a test", Bounds().Width() * 0.5, Bounds().Height() * 0.84);
+	DrawStringCentered(this, "Other Contributers:", boxsize.x * 0.5, boxsize.y * 0.65);
+	DrawStringCentered(this, "Humdinger, Owen Pan, Puck Meerburg, Luke (noryb009)", boxsize.x * 0.5, boxsize.y * 0.72);
+	DrawStringCentered(this, "Ojasva Jain, Claire50", boxsize.x * 0.5, boxsize.y * 0.79);
 	font.SetSize(18);
 	SetFont(&font);
-	DrawStringCentered(this, version, Bounds().Width() /2, versionpos.y);
-	DrawAppIcon(this, BPoint(Bounds().Width() * 0.2 , Bounds().Height() * 0.85), 96);
-	DrawAppIcon(this, BPoint(Bounds().Width() * 0.85 , Bounds().Height() * 0.85), 96);
+	DrawStringCentered(this, version, boxsize.x * 0.50, boxsize.y * 0.97);
+	DrawAppIcon(this, BPoint(boxsize.x * 0.20, boxsize.y * 0.85), 96);
+	DrawAppIcon(this, BPoint(boxsize.x * 0.85, boxsize.y * 0.85), 96);
 }

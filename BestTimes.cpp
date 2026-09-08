@@ -281,7 +281,6 @@ void BestTimesView::AttachedToWindow(void)
 
 void BestTimesView::Draw(BRect update)
 {
-	//DrawBitmap(fLogo, BPoint(0,0));
 	DrawTriangleBackground(this, Bounds());
 	SetHighColor(0,0,0,180);
 	BFont font;

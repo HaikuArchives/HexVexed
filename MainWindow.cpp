@@ -207,7 +207,7 @@ MainWindow::MainWindow(void)
 
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("How to play" B_UTF8_ELLIPSIS,new BMessage(M_HOW_TO_PLAY)));
-	menu->AddItem(new BMenuItem("Best Times",new BMessage(M_BEST_TIMES)));
+	menu->AddItem(new BMenuItem("Best times",new BMessage(M_BEST_TIMES)));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("About HexVexed",new BMessage(B_ABOUT_REQUESTED)));
 
