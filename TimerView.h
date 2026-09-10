@@ -17,8 +17,11 @@ public:
 	virtual void AttachedToWindow();
 
 private:
+	void UpdateDisplay(int seconds);
+
 	bool fRunning;
 	bigtime_t fStartTime;
+	bigtime_t fStopTime;
 };
 
 #endif

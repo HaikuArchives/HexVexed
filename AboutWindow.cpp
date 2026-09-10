@@ -14,6 +14,7 @@
 #include <Screen.h>
 #include <TranslationUtils.h>
 #include "AboutWindow.h"
+#include "DrawHelpers.h"
 
 // In case I want to localize this later
 #define TRANSLATE(x) x
@@ -26,16 +27,10 @@ AboutWindow::AboutWindow(BRect parentFrame)
 	AboutView *aboutview=new AboutView(Bounds());
 	AddChild(aboutview);
 	
-	BRect centerOn;
-	if (parentFrame.IsValid()){
-		centerOn = parentFrame;
-	} else {
-		BScreen screen;
-		centerOn = screen.Frame();
-	}
-
-	MoveTo(centerOn.left + (centerOn.Width() - Frame().Width()) / 2,
-		centerOn.top + (centerOn.Height() - Frame().Height()) / 2);
+	if (parentFrame.IsValid())
+		CenterIn(parentFrame);
+	else
+		CenterOnScreen();
 }
 
 AboutView::AboutView(BRect frame)
@@ -43,7 +38,7 @@ AboutView::AboutView(BRect frame)
 {
 	SetViewColor(126,126,190);
 	
-	fLogo=BTranslationUtils::GetBitmap('PNG ',"HexVexedAbout.png");
+	fLogo=BTranslationUtils::GetBitmap('PNG ',"HexVexed.png");
 	
 	app_info ai;
 	version_info vi;
@@ -83,31 +78,64 @@ AboutView::AboutView(BRect frame)
 	
 	font_height height;
 	be_plain_font->GetHeight(&height);
-	
-	versionpos.x = (fLogo->Bounds().Width() - StringWidth(version)) / 2;
-	versionpos.y = fLogo->Bounds().bottom - 5 - height.descent;
-	
+	//versionpos.y = fLogo->Bounds().bottom - 5 - height.descent;
+
 	SetDrawingMode(B_OP_OVER);
 }
+
 
 AboutView::~AboutView(void)
 {
 	delete fLogo;
 }
 
+
 void AboutView::MouseDown(BPoint pt)
 {
 	Window()->PostMessage(B_QUIT_REQUESTED);
 }
 
+
 void AboutView::AttachedToWindow(void)
 {
-	Window()->ResizeTo(fLogo->Bounds().Width(),fLogo->Bounds().Height());
+	Window()->ResizeTo(600, 500);
 }
+
 
 void AboutView::Draw(BRect update)
 {
-	DrawBitmap(fLogo, BPoint(0,0));
+	BPoint boxsize;
+	boxsize.Set(Bounds().Width(), Bounds().Height());
+	DrawTriangleBackground(this, update);
+	float logoSize = 475;
+	DrawResourcePNG(this, "HexVexed-PNG",
+		BPoint(Bounds().Width() / 2, 75), logoSize);
 	SetHighColor(0,0,0,180);
-	DrawString(version,versionpos);
+	BFont font;
+	font.SetSize(96);
+	font.SetFace(B_BOLD_FACE);
+	font.SetFace(B_OUTLINED_FACE);
+	SetFont(&font);
+	//DrawStringCentered(this, "HexVexed", boxsize.x * 0.5, boxsize.y * 0.23);
+	font.SetFace(B_REGULAR_FACE);
+	font.SetFace(B_ITALIC_FACE);
+	font.SetSize(28);
+	SetFont(&font);
+	DrawStringCentered(this, "by Scott McCreary", boxsize.x * 0.5, boxsize.y * 0.35);
+	font.SetSize(24);
+	SetFont(&font);
+	DrawStringCentered(this, "Based on BeVexed", boxsize.x * 0.25, boxsize.y * 0.45);
+	DrawStringCentered(this, "by DarkWyrm", boxsize.x * 0.25, boxsize.y * 0.55);
+	DrawStringCentered(this, "Icon and Graphics", boxsize.x * 0.75, boxsize.y * 0.45);
+	DrawStringCentered(this, "by Stephanie Fu", boxsize.x * 0.75, boxsize.y * 0.55);
+	font.SetSize(20);
+	SetFont(&font);
+	DrawStringCentered(this, "Other Contributers:", boxsize.x * 0.5, boxsize.y * 0.65);
+	DrawStringCentered(this, "Humdinger, Owen Pan, Puck Meerburg, Luke (noryb009)", boxsize.x * 0.5, boxsize.y * 0.72);
+	DrawStringCentered(this, "Ojasva Jain, Claire50", boxsize.x * 0.5, boxsize.y * 0.79);
+	font.SetSize(18);
+	SetFont(&font);
+	DrawStringCentered(this, version, boxsize.x * 0.50, boxsize.y * 0.97);
+	DrawAppIcon(this, BPoint(boxsize.x * 0.20, boxsize.y * 0.85), 96);
+	DrawAppIcon(this, BPoint(boxsize.x * 0.85, boxsize.y * 0.85), 96);
 }

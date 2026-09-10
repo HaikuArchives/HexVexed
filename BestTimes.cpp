@@ -16,8 +16,11 @@
 #include <String.h>
 #include <stdio.h>
 #include <Screen.h>
+#include <time.h>
 #include <TranslationUtils.h>
 #include <vector>
+
+#include "DrawHelpers.h"
 
 // In case I want to localize this later
 #define TRANSLATE(x) x
@@ -30,6 +33,20 @@ BString BestTimes::KeyFor(uint8 numberBase, uint8 gridSize)
 {
 	BString key;
 	key.SetToFormat("times_nb%u_gs%u", numberBase, gridSize);
+	return key;
+}
+
+
+static bool CompareEntriesBySeconds(const BestTimeEntry &a, const BestTimeEntry &b)
+{
+	return a.seconds < b.seconds;
+}
+
+
+BString BestTimes::DateKeyFor(uint8 numberBase, uint8 gridSize)
+{
+	BString key;
+	key.SetToFormat("date_nb%u_gs%u", numberBase, gridSize);
 	return key;
 }
 
@@ -60,6 +77,7 @@ status_t BestTimes::Save()
 	return fBestTimes.Flatten(&file);
 }
 
+
 status_t BestTimes::Load()
 {
 	if (!fBestTimesLock.IsLocked())
@@ -86,10 +104,12 @@ void BestTimes::UnlockBestTimes()
 }
 
 
+static BMessage sEmptyBestTimesMessage;
+
 BMessage & BestTimes::Message()
 {
 	if (!fBestTimesLock.IsLocked())
-		return *(BMessage *)NULL;
+		return sEmptyBestTimesMessage;
 	return fBestTimes;
 }
 
@@ -101,25 +121,49 @@ void BestTimes::AddTime(uint8 numberBase, uint8 gridSize, int32 seconds)
 
 	Load();
 
-	BString key = KeyFor(numberBase, gridSize);
+	BString timesKey = KeyFor(numberBase, gridSize);
+	BString datesKey = DateKeyFor(numberBase, gridSize);
 
-	std::vector<int32> times;
-	int32 existing;
-	for (int32 i = 0; fBestTimes.FindInt32(key.String(), i, &existing) == B_OK; i++)
-		times.push_back(existing);
+	time_t now = time(NULL);
+	struct tm *tmNow = localtime(&now);
+	char dateStr[11];
+	strftime(dateStr, sizeof(dateStr), "%Y-%m-%d", tmNow);
 
-	times.push_back(seconds);
-	std::sort(times.begin(), times.end());
+	std::vector<BestTimeEntry> entries;
+	int32 existingSeconds;
+	for (int32 i = 0;
+			fBestTimes.FindInt32(timesKey.String(), i, &existingSeconds) == B_OK;
+			i++) {
+		BString existingDate;
+		if(fBestTimes.FindString(datesKey.String(), i, &existingDate) != B_OK)
+			existingDate = "unknown";
 
-	if (times.size() > TOPXTIMES)
-		times.resize(TOPXTIMES);
+		BestTimeEntry entry;
+		entry.seconds = existingSeconds;
+		entry.date = existingDate;
+		entries.push_back(entry);
+	}
 
-	fBestTimes.RemoveName(key.String());
-	for (size_t i = 0; i < times.size(); i++)
-		fBestTimes.AddInt32(key.String(), times[i]);
+	BestTimeEntry newEntry;
+	newEntry.seconds = seconds;
+	newEntry.date = dateStr;
+	entries.push_back(newEntry);
+
+	std::sort(entries.begin(), entries.end(), CompareEntriesBySeconds);
+
+	if (entries.size() > TOPXTIMES)
+		entries.resize(TOPXTIMES);
+
+	fBestTimes.RemoveName(timesKey.String());
+	fBestTimes.RemoveName(datesKey.String());
+	for (size_t i = 0; i < entries.size(); i++) {
+		fBestTimes.AddInt32(timesKey.String(), entries[i].seconds);
+		fBestTimes.AddString(datesKey.String(), entries[i].date);
+	}
+
 	status_t saveStatus = Save();
 	printf("BestTimes::AddTime saved %zu entries for %s, status=%s\n",
-		times.size(), key.String(), strerror(saveStatus));
+		entries.size(), timesKey.String(), strerror(saveStatus));
 	UnlockBestTimes();
 }
 
@@ -131,14 +175,19 @@ void BestTimes::PrintBestTimes(uint8 numberBase, uint8 gridSize)
 
 	Load();
 
-	BString key = KeyFor(numberBase, gridSize);
+	BString timesKey = KeyFor(numberBase, gridSize);
+	BString datesKey = DateKeyFor(numberBase, gridSize);
+
 	printf("Best times (number base %u, grid size %u):\n", numberBase, gridSize);
 
 	int32 seconds;
 	int32 rank = 0;
-	for (int32 i = 0; fBestTimes.FindInt32(key.String(), i, &seconds) == B_OK; i++) {
+	for (int32 i = 0; fBestTimes.FindInt32(timesKey.String(), i, &seconds) == B_OK; i++) {
 		rank++;
-		printf("  %2d. %02d:%02d\n", rank, seconds / 60, seconds % 60);
+		BString date;
+		if (fBestTimes.FindString(datesKey.String(), i, &date) != B_OK)
+			date = "unknown";
+		printf("  %2d. %02d:%02d  %s\n", rank, seconds / 60, seconds % 60, date.String());
 	}
 	if (rank == 0)
 		printf("  (no times recorded yet)\n");
@@ -148,28 +197,24 @@ void BestTimes::PrintBestTimes(uint8 numberBase, uint8 gridSize)
 
 
 BestTimesWindow::BestTimesWindow(BRect parentFrame, uint8 numberBase, uint8 gridSize)
- : BWindow(BRect(100,100,5000,400),"BestTimes", B_MODAL_WINDOW_LOOK,
+ : BWindow(BRect(100,100,500,400),"BestTimes", B_MODAL_WINDOW_LOOK,
  	B_MODAL_APP_WINDOW_FEEL,
  	B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
 {
-	BestTimesView *besttimesview=new BestTimesView(Bounds());
+	BestTimesView *besttimesview=new BestTimesView(Bounds(), numberBase, gridSize);
 	AddChild(besttimesview);
 
-	BRect centerOn;
-	if (parentFrame.IsValid()){
-		centerOn = parentFrame;
-	} else {
-		BScreen screen;
-		centerOn = screen.Frame();
-	}
-
-	MoveTo(centerOn.left + (centerOn.Width() - Frame().Width()) / 2,
-		centerOn.top + (centerOn.Height() - Frame().Height()) / 2);
+	if(parentFrame.IsValid())
+		CenterIn(parentFrame);
+	else
+		CenterOnScreen();
 }
 
 
-BestTimesView::BestTimesView(BRect frame)
- : BView (frame, "BestTimesView", B_FOLLOW_ALL, B_WILL_DRAW)
+BestTimesView::BestTimesView(BRect frame, uint8 numberBase, uint8 gridSize)
+ : BView (frame, "BestTimesView", B_FOLLOW_ALL, B_WILL_DRAW),
+	fNumberBase(numberBase),
+	fGridSize(gridSize)
 {
 	SetViewColor(126,126,190);
 
@@ -181,6 +226,38 @@ BestTimesView::BestTimesView(BRect frame)
 	BFile file(&ai.ref,B_READ_ONLY);
 	BAppFileInfo appinfo(&file);
 	appinfo.GetVersionInfo(&vi,B_APP_VERSION_KIND);
+
+	LoadTimes();
+}
+
+
+void BestTimesView::LoadTimes(void)
+{
+	fTimes.clear();
+
+	if(BestTimes::LockBestTimes() != B_OK)
+		return;
+
+	BestTimes::Load();
+
+	BString timesKey = BestTimes::KeyFor(fNumberBase, fGridSize);
+	BString datesKey = BestTimes::DateKeyFor(fNumberBase, fGridSize);
+
+	int32 seconds;
+	for (int32 i = 0;
+		BestTimes::Message().FindInt32(timesKey.String(), i, &seconds) == B_OK;
+		i++) {
+		BString date;
+		if (BestTimes::Message().FindString(datesKey.String(), i, &date) != B_OK)
+			date = "unknown";
+
+		BestTimeEntry entry;
+		entry.seconds = seconds;
+		entry.date = date;
+		fTimes.push_back(entry);
+	}
+
+	BestTimes::UnlockBestTimes();
 }
 
 
@@ -202,35 +279,70 @@ void BestTimesView::AttachedToWindow(void)
 }
 
 
-void BestTimesView::Draw(BRect frame, uint8 numberBase, uint8 gridSize)
+void BestTimesView::Draw(BRect update)
 {
-	sprintf(besttimestext,"This is a test");
-	DrawBitmap(fLogo, BPoint(0,0));
+	DrawTriangleBackground(this, Bounds());
 	SetHighColor(0,0,0,180);
+
+	float logoSize = 475;
+	DrawResourcePNG(this, "HexVexed-PNG",
+	BPoint(Bounds().Width() / 2, 75), logoSize);
+
+	BFont font;
+	font.SetSize(48);
+	SetFont(&font);
+	float textwidth;
 	textpos.x = 50;
-	textpos.y = 50;
-	DrawString(besttimestext,textpos);
+	BPoint center(update.left + (update.Width() /2), update.top + (update.Height() /2));
 
-	if (BestTimes::LockBestTimes() != B_OK)
-		return;
+	DrawStringCentered(this, "Best Times", Bounds().Width() * 0.5, Bounds().Height() * 0.35);
+	font.SetSize(24);
+	SetFont(&font);
 
-	BestTimes::Load();
-
-	BString key = BestTimes::KeyFor(numberBase, gridSize);
-	printf("Best times (number base %u, grid size %u):\n", numberBase, gridSize);
-
-	int32 seconds;
-	int32 rank = 0;
-	textpos.x = 50;
-	textpos.y = 50;
-	for (int32 i = 0; BestTimes::fBestTimes.FindInt32(key.String(), i, &seconds) == B_OK; i++) {
-		rank++;
-		printf("  %2d. %02d:%02d\n", rank, seconds / 60, seconds % 60);
-		textpos.y = 50 + i *15;
-		sprintf(besttimestext, "  %2d. %02d:%02d\n", rank, seconds / 60, seconds % 60, textpos);
+	switch(fNumberBase)
+	{
+		case 2:
+		sprintf(besttimestext, "Binary - Grid Size %u", fGridSize);
+			break;
+		case 4:
+		sprintf(besttimestext, "Quarternary - Grid Size %u", fGridSize);
+			break;
+		case 6:
+		sprintf(besttimestext, "Heximal - Grid Size %u", fGridSize);
+			break;
+		case 8:
+		sprintf(besttimestext, "Octal - Grid Size %u", fGridSize);
+			break;
+		case 10:
+		sprintf(besttimestext, "Decimal - Grid Size %u", fGridSize);
+			break;
+		case 16:
+			sprintf(besttimestext, "Hexidecimal - Grid Size %u", fGridSize);
+			break;
 	}
-	if (rank == 0)
-		printf("  (no times recorded yet)\n");
 
-	BestTimes::UnlockBestTimes();
+	DrawStringCentered(this, besttimestext, Bounds().Width() * 0.5, Bounds().Height() * 0.41);
+	font.SetSize(17);
+	SetFont(&font);
+
+	if(fTimes.empty()) {
+		textpos.y = 210;
+		sprintf(besttimestext, "(no times recorded yet)");
+		textwidth = StringWidth(besttimestext);
+		textpos.x = center.x - (textwidth / 2);
+		DrawString(besttimestext, textpos);
+		return;
+	}
+
+	int32 rank = 0;
+	for (std::vector<BestTimeEntry>::const_iterator it = fTimes.begin(); it != fTimes.end(); ++it) {
+		rank++;
+		// printf("  %2d. %02d:%02d\n", rank, seconds / 60, seconds % 60);
+		textpos.y = 210 + (rank - 1) * 23;
+		sprintf(besttimestext, "  %2d. %02d:%02d   %s", rank, it->seconds / 60, it->seconds % 60,
+			it->date.String());
+		DrawStringCentered(this, besttimestext, Bounds().Width() / 2, textpos.y);
+		DrawAppIcon(this, BPoint(Bounds().Width() * 0.2 , Bounds().Height() * 0.85), 96);
+		DrawAppIcon(this, BPoint(Bounds().Width() * 0.85 , Bounds().Height() * 0.85), 96);
+	}
 }
