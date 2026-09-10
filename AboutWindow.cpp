@@ -38,7 +38,7 @@ AboutView::AboutView(BRect frame)
 {
 	SetViewColor(126,126,190);
 	
-	fLogo=BTranslationUtils::GetBitmap('PNG ',"HexVexedAbout.png");
+	fLogo=BTranslationUtils::GetBitmap('PNG ',"HexVexed.png");
 	
 	app_info ai;
 	version_info vi;
@@ -98,7 +98,7 @@ void AboutView::MouseDown(BPoint pt)
 
 void AboutView::AttachedToWindow(void)
 {
-	Window()->ResizeTo(fLogo->Bounds().Width(),fLogo->Bounds().Height());
+	Window()->ResizeTo(600, 500);
 }
 
 
@@ -107,13 +107,16 @@ void AboutView::Draw(BRect update)
 	BPoint boxsize;
 	boxsize.Set(Bounds().Width(), Bounds().Height());
 	DrawTriangleBackground(this, update);
+	float logoSize = 475;
+	DrawResourcePNG(this, "HexVexed-PNG",
+		BPoint(Bounds().Width() / 2, 75), logoSize);
 	SetHighColor(0,0,0,180);
 	BFont font;
 	font.SetSize(96);
 	font.SetFace(B_BOLD_FACE);
 	font.SetFace(B_OUTLINED_FACE);
 	SetFont(&font);
-	DrawStringCentered(this, "HexVexed", boxsize.x * 0.5, boxsize.y * 0.23);
+	//DrawStringCentered(this, "HexVexed", boxsize.x * 0.5, boxsize.y * 0.23);
 	font.SetFace(B_REGULAR_FACE);
 	font.SetFace(B_ITALIC_FACE);
 	font.SetSize(28);

@@ -2873,3 +2873,9 @@ resource vector_icon array {
 	$"08010902412492000000000000406BCAC86492C31AF20A07010A02409DBCB2CA"
 	$"6533044F406B83C65562C17AE1"
 };
+
+
+resource(4, "HexVexed-PNG") #'PNG '
+	import "HexVexed.png";
+
+

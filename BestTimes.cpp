@@ -283,6 +283,11 @@ void BestTimesView::Draw(BRect update)
 {
 	DrawTriangleBackground(this, Bounds());
 	SetHighColor(0,0,0,180);
+
+	float logoSize = 475;
+	DrawResourcePNG(this, "HexVexed-PNG",
+	BPoint(Bounds().Width() / 2, 75), logoSize);
+
 	BFont font;
 	font.SetSize(48);
 	SetFont(&font);
@@ -290,7 +295,7 @@ void BestTimesView::Draw(BRect update)
 	textpos.x = 50;
 	BPoint center(update.left + (update.Width() /2), update.top + (update.Height() /2));
 
-	DrawStringCentered(this, "Best Times", Bounds().Width() * 0.5, Bounds().Height() * 0.15);
+	DrawStringCentered(this, "Best Times", Bounds().Width() * 0.5, Bounds().Height() * 0.35);
 	font.SetSize(24);
 	SetFont(&font);
 
@@ -316,12 +321,12 @@ void BestTimesView::Draw(BRect update)
 			break;
 	}
 
-	DrawStringCentered(this, besttimestext, Bounds().Width() * 0.5, Bounds().Height() * 0.22);
-	font.SetSize(18);
+	DrawStringCentered(this, besttimestext, Bounds().Width() * 0.5, Bounds().Height() * 0.41);
+	font.SetSize(17);
 	SetFont(&font);
 
 	if(fTimes.empty()) {
-		textpos.y = 50;
+		textpos.y = 210;
 		sprintf(besttimestext, "(no times recorded yet)");
 		textwidth = StringWidth(besttimestext);
 		textpos.x = center.x - (textwidth / 2);
@@ -333,7 +338,7 @@ void BestTimesView::Draw(BRect update)
 	for (std::vector<BestTimeEntry>::const_iterator it = fTimes.begin(); it != fTimes.end(); ++it) {
 		rank++;
 		// printf("  %2d. %02d:%02d\n", rank, seconds / 60, seconds % 60);
-		textpos.y = 130 + (rank - 1) * 30;
+		textpos.y = 210 + (rank - 1) * 23;
 		sprintf(besttimestext, "  %2d. %02d:%02d   %s", rank, it->seconds / 60, it->seconds % 60,
 			it->date.String());
 		DrawStringCentered(this, besttimestext, Bounds().Width() / 2, textpos.y);

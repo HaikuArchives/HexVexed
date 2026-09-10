@@ -11,6 +11,9 @@
 #include <File.h>
 #include <NodeInfo.h>
 #include <Roster.h>
+#include <TranslationUtils.h>
+
+#include <stdio.h>
 
 void DrawTriangleBackground(BView *view, BRect bounds)
 {
@@ -99,3 +102,33 @@ void DrawAppIcon(BView *view, BPoint center, float size)
 }
 
 
+void DrawResourcePNG(BView *view, const char *resourceName, BPoint center, float width)
+{
+	static BBitmap *sCachedBitmap = NULL;
+	static bool sLoaded = false;
+
+	if(!sLoaded) {
+		sLoaded = true;
+		sCachedBitmap = BTranslationUtils::GetBitmap('PNG ', resourceName);
+		printf("DrawResourcePng: loading resource '%s' -> %s\n", resourceName,
+			sCachedBitmap ? "success" : "FAILED (returned NULL)");
+	}
+
+	if(!sCachedBitmap)
+		return;
+
+	BRect srcBounds = sCachedBitmap->Bounds();
+	float aspect = srcBounds.Height() / srcBounds.Width();
+	float height = width * aspect;
+
+	BRect dest(center.x - width / 2, center.y - height / 2,
+		center.x + width / 2, center.y + height / 2);
+
+	drawing_mode oldMode = view->DrawingMode();
+	view->SetDrawingMode(B_OP_ALPHA);
+	view->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+
+	view->DrawBitmap(sCachedBitmap, srcBounds, dest, B_FILTER_BITMAP_BILINEAR);
+
+	view->SetDrawingMode(oldMode);
+}

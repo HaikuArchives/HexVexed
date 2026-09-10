@@ -14,5 +14,6 @@
 void DrawTriangleBackground(BView *view, BRect bounds);
 void DrawStringCentered(BView *view, const char *text, float centerX, float y);
 void DrawAppIcon(BView *view, BPoint center, float size);
+void DrawResourcePNG(BView *view, const char *resourceName, BPoint center, float width);
 
 #endif
