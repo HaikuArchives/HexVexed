@@ -507,6 +507,8 @@ void MainWindow::GenerateGrid(uint8 size, bool newGame)
 		fGrid->SetNumberBase(fNumberBase);
 		fGrid->GeneratePuzzle();
 
+		fMaxTileCount = (uint16)size * size;
+
 		fTileBackup.clear();
 		for(int32 i = 0; i < (int32)size * size; i++) {
 			HexTile *t = fGrid->TileAt(i);
@@ -557,21 +559,35 @@ void MainWindow::UpdateTileBackup(HexTile *tile)
 
 void MainWindow::VerifyBoardIntegrity(void)
 {
-	std::set<uint16> present;
+	std::map<uint16, std::vector<HexTileView *> > occupied;
 
-	for(int32 i = 0; i < fBack->CountChildren(); i++) {
+	for (int32 i = 0; i < fBack->CountChildren(); i++) {
 		HexTileView *view = dynamic_cast<HexTileView *>(fBack->ChildAt(i));
-		if(!view)
+		if (!view)
 			continue;
 
 		HexTile *tile = view->GetTile();
-		if(tile && !tile->IsEmpty())
-			present.insert(tile->id);
+		if (tile && !tile->IsEmpty())
+			occupied[tile->id].push_back(view);
 	}
 
-	for(std::map<uint16, HexTile>::const_iterator it = fTileBackup.begin();
+	// A given piece id should only ever occupy one slot. If it shows
+	// up more than once, keep the first copy and clear the rest.
+	for (std::map<uint16, std::vector<HexTileView *> >::iterator it = occupied.begin();
+			it != occupied.end(); ++it) {
+		std::vector<HexTileView *> &views = it->second;
+		for (size_t i = 1; i < views.size(); i++) {
+			printf("VerifyBoardIntegrity: duplicate tile id=%u found, clearing extra copy\n",
+				it->first);
+			views[i]->GetTile()->MakeEmpty();
+			views[i]->Invalidate();
+		}
+	}
+
+	// Restore any tile that's missing entirely from the board.
+	for (std::map<uint16, HexTile>::const_iterator it = fTileBackup.begin();
 			it != fTileBackup.end(); ++it) {
-		if(present.find(it->first) != present.end())
+		if (occupied.find(it->first) != occupied.end())
 			continue;
 
 		printf("VerifyBoardIntegrity: tile id=%u missing from board, restoring\n",
@@ -580,16 +596,16 @@ void MainWindow::VerifyBoardIntegrity(void)
 		HexTileView *fallback = NULL;
 		bool restored = false;
 
-		for(int32 i = 0; i < fBack->CountChildren() && !restored; i++) {
+		for (int32 i = 0; i < fBack->CountChildren() && !restored; i++) {
 			HexTileView *view = dynamic_cast<HexTileView *>(fBack->ChildAt(i));
-			if(!view)
+			if (!view)
 				continue;
 
 			HexTile *slot = view->GetTile();
-			if(!slot || !slot->IsEmpty())
+			if (!slot || !slot->IsEmpty())
 				continue;
 
-			if(view->GridId() == fGrid->Id()) {
+			if (view->GridId() == fGrid->Id()) {
 				*slot = it->second;
 				slot->gridid = fGrid->Id();
 				view->Invalidate();
@@ -599,14 +615,45 @@ void MainWindow::VerifyBoardIntegrity(void)
 			}
 		}
 
-		if(!restored && fallback) {
+		if (!restored && fallback) {
 			HexTile *slot = fallback->GetTile();
 			*slot = it->second;
 			slot->gridid = fallback->GridId();
 			fallback->Invalidate();
 		}
 	}
+
+	// Final safety net: total occupied slots should never exceed the
+	// number of pieces this game started with, regardless of cause.
+	int32 totalOccupied = 0;
+	for (int32 i = 0; i < fBack->CountChildren(); i++) {
+		HexTileView *view = dynamic_cast<HexTileView *>(fBack->ChildAt(i));
+		if (!view)
+			continue;
+		HexTile *tile = view->GetTile();
+		if (tile && !tile->IsEmpty())
+			totalOccupied++;
+	}
+
+	if (totalOccupied > fMaxTileCount) {
+		printf("VerifyBoardIntegrity: %ld tiles active, expected at most %u - clearing excess\n",
+			(long)totalOccupied, fMaxTileCount);
+
+		int32 toRemove = totalOccupied - fMaxTileCount;
+		for (int32 i = 0; i < fBack->CountChildren() && toRemove > 0; i++) {
+			HexTileView *view = dynamic_cast<HexTileView *>(fBack->ChildAt(i));
+			if (!view)
+				continue;
+			HexTile *tile = view->GetTile();
+			if (tile && !tile->IsEmpty()) {
+				tile->MakeEmpty();
+				view->Invalidate();
+				toRemove--;
+			}
+		}
+	}
 }
+
 
 void MainWindow::ScanBackgrounds(void)
 {

@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <String.h>
 #include <TranslationUtils.h>
+#include <vector>
 #include <Window.h>
 
 #include "HexTile.h"
@@ -41,6 +42,7 @@ private:
 	void	SetBackground(const char *name);
 
 	std::map<uint16, HexTile> fTileBackup;
+	uint16 fMaxTileCount;
 
 	void	UpdateTileBackup(HexTile *tile);
 	void	VerifyBoardIntegrity(void);
@@ -53,7 +55,6 @@ private:
 	uint8 fGridSize;
 	uint8 fTileSize;
 	uint8 fNumberBase;
-
 	BString fBackPath;
 	BString fBackName;
 	bool fGameOver;
